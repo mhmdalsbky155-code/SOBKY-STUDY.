@@ -3,44 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة السبكي الاحترافية | Sobky Edu-Pro</title>
+    <title>منصة السبكي التعليمية المتكاملة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #010409; color: #e6edf3; overflow-x: hidden; }
+        body { font-family: 'Cairo', sans-serif; background: #010409; color: #e6edf3; }
         .glass { background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(20px); border: 1px solid #30363d; }
-        .sidebar { transition: transform 0.3s ease-in-out; z-index: 100; }
-        .star-rating { cursor: pointer; font-size: 1.5rem; color: #30363d; transition: color 0.2s; }
-        .star-rating.active { color: #f2c94c; }
-        .option-btn { background: #21262d; border: 1px solid #30363d; width: 100%; padding: 0.8rem; border-radius: 1rem; text-align: right; margin-bottom: 0.5rem; }
+        .sidebar { transition: transform 0.3s; z-index: 1000; }
+        .word-span { cursor: pointer; position: relative; display: inline-block; }
+        .word-span:hover { background: rgba(88, 166, 255, 0.2); border-radius: 4px; }
+        .translation-popup { position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: #58a6ff; color: white; padding: 5px 12px; border-radius: 8px; font-size: 14px; z-index: 2000; white-space: nowrap; }
+        .option-btn { background: #21262d; border: 1px solid #30363d; width: 100%; padding: 0.8rem; border-radius: 1rem; text-align: right; margin-bottom: 0.5rem; transition: 0.3s; }
         .correct { background: #238636 !important; }
         .wrong { background: #da3633 !important; }
-        .hidden { display: none; }
+        .loader { width: 30px; height: 30px; border: 3px solid #30363d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <button id="menuBtn" class="fixed top-5 right-5 z-[110] bg-blue-600 p-2 rounded-lg hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+    <button id="menuBtn" class="fixed top-5 right-5 z-[1100] bg-blue-600 p-2 rounded-lg hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
     </button>
-
-    <div id="sidebar" class="fixed inset-y-0 right-0 w-64 glass sidebar transform translate-x-full p-6 shadow-2xl">
-        <h2 class="text-xl font-bold mb-8 text-blue-400 border-b border-gray-700 pb-2">القائمة</h2>
-        <nav class="space-y-4">
-            <button onclick="showAdminPrompt()" class="w-full text-right hover:text-blue-400 transition">👤 لوحة الإدارة (Admin)</button>
-            <button onclick="showSection('vault')" class="w-full text-right hover:text-blue-400 transition">📦 الخزنة (الملفات)</button>
-            <button onclick="showSection('mainDashboard')" class="w-full text-right hover:text-blue-400 transition">🏠 الرئيسية</button>
-            <button onclick="showSection('support')" class="w-full text-right hover:text-blue-400 transition">🚩 إبلاغ عن مشكلة</button>
-            <div class="pt-10">
-                <button onclick="location.reload()" class="w-full text-right text-red-500">🚪 خروج</button>
-            </div>
+    <div id="sidebar" class="fixed inset-y-0 right-0 w-72 glass sidebar transform translate-x-full p-6 overflow-y-auto shadow-2xl">
+        <h2 class="text-xl font-bold mb-6 text-blue-400 border-b border-gray-700 pb-2">القائمة التعليمية</h2>
+        <nav class="space-y-4 text-right text-sm">
+            <button onclick="showAdminPrompt()" class="w-full text-right hover:text-blue-400">🛠 لوحة الإدارة (1542)</button>
+            <button onclick="showSection('studyStats')" class="w-full text-right hover:text-blue-400">⏱ ساعات المذاكرة</button>
+            <button onclick="showSection('examHistory')" class="w-full text-right hover:text-blue-400">📊 سجل الامتحانات</button>
+            <button onclick="showSection('vault')" class="w-full text-right hover:text-blue-400">📦 الخزنة</button>
+            <button onclick="showSection('mainDashboard')" class="w-full text-right hover:text-blue-400">🏠 الرئيسية</button>
+            <button onclick="showSection('support')" class="w-full text-right hover:text-blue-400">🚩 بلاغ أو اقتراح</button>
+            <button onclick="location.reload()" class="w-full text-right text-red-500 mt-6">🚪 خروج</button>
         </nav>
+        <div class="mt-10 p-4 bg-blue-900/20 rounded-xl text-center">
+            <p class="text-[10px] text-gray-400">عداد الجلسة الحالية</p>
+            <div id="sessionTimer" class="text-xl font-bold text-blue-400">00:00:00</div>
+        </div>
     </div>
 
-    <div id="authScreen" class="fixed inset-0 z-[120] flex items-center justify-center bg-[#010409] p-4">
+    <div id="authScreen" class="fixed inset-0 z-[1200] flex items-center justify-center bg-[#010409] p-4">
         <div class="glass p-8 rounded-[2rem] w-full max-w-md border-t-4 border-blue-600">
             <h1 class="text-3xl font-bold text-center mb-6">Sobky AI</h1>
             <div class="space-y-4">
@@ -48,113 +51,107 @@
                 <input type="text" id="uID" placeholder="الرقم التعريفي (ID)" class="w-full bg-[#0d1117] border border-[#30363d] p-3 rounded-xl outline-none focus:border-blue-500">
                 <input type="tel" id="uPhone" placeholder="رقم التليفون" class="w-full bg-[#0d1117] border border-[#30363d] p-3 rounded-xl outline-none focus:border-blue-500">
                 <input type="password" id="uPass" placeholder="كلمة المرور" class="w-full bg-[#0d1117] border border-[#30363d] p-3 rounded-xl outline-none focus:border-blue-500">
-                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold">دخول الطالب</button>
+                <button onclick="login()" class="w-full bg-blue-600 py-3 rounded-xl font-bold">دخول النظام</button>
             </div>
         </div>
     </div>
 
-    <div id="contentArea" class="p-4 pt-20 max-w-6xl mx-auto hidden">
-        
+    <div id="contentArea" class="p-4 pt-20 max-w-7xl mx-auto hidden">
         <section id="mainDashboard" class="section">
-            <div class="flex justify-between items-center mb-6 glass p-4 rounded-xl">
-                <h3 class="font-bold">أهلاً، <span id="userName" class="text-blue-400"></span></h3>
-                <input type="file" id="fileUpload" class="hidden" accept=".pdf" onchange="processPDF(event)">
-                <button onclick="document.getElementById('fileUpload').click()" class="bg-blue-600 px-4 py-1 rounded-lg text-sm">+ رفع PDF</button>
+            <div class="glass p-6 rounded-2xl mb-6 flex justify-between items-center">
+                <div>أهلاً، <span id="userName" class="text-blue-400 font-bold"></span></div>
+                <input type="file" id="pdfInp" class="hidden" accept=".pdf" onchange="processPDF(event)">
+                <button onclick="document.getElementById('pdfInp').click()" class="bg-blue-600 px-6 py-2 rounded-xl text-sm font-bold">+ رفع PDF</button>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <button onclick="startMode('study')" class="glass p-6 rounded-2xl border-b-4 border-blue-500">💡 وضع المذاكرة</button>
-                <button onclick="startMode('exam')" class="glass p-6 rounded-2xl border-b-4 border-orange-500">📝 امتحان (10 أسئلة)</button>
-                <button onclick="startMode('comprehensive')" class="glass p-6 rounded-2xl border-b-4 border-purple-500 md:col-span-2">🏆 امتحان شامل (30 سؤال)</button>
-            </div>
-
-            <div id="displayArea" class="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[60vh] hidden">
-                <div id="pdfView" class="glass p-6 rounded-2xl overflow-y-auto bg-black/20"></div>
-                <div id="sideAction" class="glass p-6 rounded-2xl overflow-y-auto"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[70vh]">
+                <div id="pdfView" class="md:col-span-2 glass p-6 rounded-2xl overflow-y-auto leading-loose text-right text-lg"></div>
+                <div id="actionSide" class="glass p-6 rounded-2xl overflow-y-auto relative">
+                    <div class="flex gap-2 mb-4">
+                        <button onclick="startMode('exam')" class="flex-1 bg-orange-600 py-2 rounded-lg text-xs">امتحان (10س)</button>
+                        <button onclick="startMode('comprehensive')" class="flex-1 bg-purple-600 py-2 rounded-lg text-xs">شامل (30س)</button>
+                    </div>
+                    <div id="sideContent" class="text-center text-gray-500 mt-10">ارفع ملفاً للبدء</div>
+                </div>
             </div>
         </section>
 
         <section id="vault" class="section hidden">
-            <h2 class="text-2xl font-bold mb-6">📦 الخزنة (ملفاتك)</h2>
-            <div id="vaultList" class="space-y-3"></div>
+            <h2 class="text-2xl font-bold mb-6">📦 الخزنة الموحدة</h2>
+            <div id="vaultList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
 
-        <section id="support" class="section hidden">
-            <div class="glass p-8 rounded-3xl max-w-2xl mx-auto">
-                <h2 class="text-2xl font-bold mb-6">🚩 إبلاغ / اقتراح</h2>
-                <div class="space-y-4">
-                    <textarea id="issueDesc" placeholder="اكتب المشكلة هنا..." class="w-full bg-black/20 border border-gray-700 p-4 rounded-xl h-32"></textarea>
-                    <textarea id="suggestionDesc" placeholder="لديك اقتراح؟ اكتبه هنا..." class="w-full bg-black/20 border border-gray-700 p-4 rounded-xl h-24"></textarea>
-                    <div class="flex items-center gap-4">
-                        <span>تقييمك:</span>
-                        <div id="starContainer" class="flex gap-1">
-                            <span class="star-rating" onclick="setRating(1)">★</span>
-                            <span class="star-rating" onclick="setRating(2)">★</span>
-                            <span class="star-rating" onclick="setRating(3)">★</span>
-                            <span class="star-rating" onclick="setRating(4)">★</span>
-                            <span class="star-rating" onclick="setRating(5)">★</span>
-                        </div>
-                    </div>
-                    <button onclick="submitReport()" class="w-full bg-blue-600 py-3 rounded-xl font-bold">إرسال للادارة</button>
-                </div>
+        <section id="studyStats" class="section hidden">
+            <h2 class="text-2xl font-bold mb-6 text-blue-400">⏱ سجل ساعات المذاكرة</h2>
+            <div class="glass p-6 rounded-2xl overflow-x-auto">
+                <table class="w-full text-right text-sm">
+                    <thead><tr class="border-b border-gray-700"><th class="p-2">اليوم والتاريخ</th><th class="p-2">مدة الجلسة</th></tr></thead>
+                    <tbody id="statsBody"></tbody>
+                </table>
             </div>
+        </section>
+
+        <section id="examHistory" class="section hidden">
+            <h2 class="text-2xl font-bold mb-6 text-orange-400">📊 سجل نتائج الاختبارات</h2>
+            <div id="historyList" class="space-y-3"></div>
         </section>
 
         <section id="adminPanel" class="section hidden">
-            <h2 class="text-2xl font-bold mb-6 text-red-500">🛠 لوحة التحكم (ادمن)</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass p-6 rounded-2xl">
-                    <h3 class="font-bold mb-4 border-b border-gray-700 pb-2">الطلاب المسجلين (<span id="countUsers">0</span>)</h3>
-                    <div id="adminUsersList" class="space-y-2 text-sm max-h-60 overflow-y-auto"></div>
-                </div>
-                <div class="glass p-6 rounded-2xl">
-                    <h3 class="font-bold mb-4 border-b border-gray-700 pb-2">الشكاوى والاقتراحات</h3>
-                    <div id="adminReportsList" class="space-y-2 text-sm max-h-60 overflow-y-auto"></div>
-                </div>
-            </div>
+            <h2 class="text-2xl font-bold mb-6 text-red-500 font-bold">🛠 لوحة تحكم الإدارة (خاص بالسبكي)</h2>
+            <div id="adminData" class="grid grid-cols-1 lg:grid-cols-3 gap-4"></div>
         </section>
 
+        <section id="support" class="section hidden">
+            <div class="glass p-8 rounded-3xl max-w-xl mx-auto">
+                <h2 class="text-2xl font-bold mb-4">🚩 تواصل مع الإدارة</h2>
+                <textarea id="msg" class="w-full bg-black/20 border border-gray-700 p-4 rounded-xl mb-4 h-32" placeholder="اكتب شكواك أو اقتراحك هنا..."></textarea>
+                <div id="stars" class="flex gap-2 mb-6 text-2xl">
+                    <span onclick="setRate(1)" class="star cursor-pointer">★</span><span onclick="setRate(2)" class="star cursor-pointer">★</span><span onclick="setRate(3)" class="star cursor-pointer">★</span><span onclick="setRate(4)" class="star cursor-pointer">★</span><span onclick="setRate(5)" class="star cursor-pointer">★</span>
+                </div>
+                <button onclick="sendMsg()" class="w-full bg-blue-600 py-3 rounded-xl font-bold">إرسال التقرير</button>
+            </div>
+        </section>
     </div>
 
     <script>
         const API_KEY = "AIzaSyC1BwXz-nHSiFfxh5ux5Y6RexU0FqlD9do";
-        const ADMIN_PASS = "1542";
         let currentUser = null;
         let allPDFs = [];
-        let currentRating = 0;
+        let sessionSeconds = 0;
+        let examStartTime = 0;
+        let rating = 0;
 
-        // نظام القائمة
-        const menuBtn = document.getElementById('menuBtn');
-        const sidebar = document.getElementById('sidebar');
-        menuBtn.onclick = () => sidebar.classList.toggle('translate-x-full');
+        // عداد الوقت
+        setInterval(() => {
+            if(currentUser) {
+                sessionSeconds++;
+                const h = Math.floor(sessionSeconds/3600).toString().padStart(2,'0');
+                const m = Math.floor((sessionSeconds%3600)/60).toString().padStart(2,'0');
+                const s = (sessionSeconds%60).toString().padStart(2,'0');
+                document.getElementById('sessionTimer').innerText = `${h}:${m}:${s}`;
+            }
+        }, 1000);
 
         function login() {
             const name = document.getElementById('uName').value;
             const pass = document.getElementById('uPass').value;
             if(pass === "elsobky12222" && name.length > 2) {
                 currentUser = { 
-                    name: name, 
+                    name, 
                     id: document.getElementById('uID').value, 
-                    phone: document.getElementById('uPhone').value 
+                    phone: document.getElementById('uPhone').value,
+                    loginTime: new Date().toLocaleString('ar-EG')
                 };
-                // حفظ في الادمن
-                saveUser(currentUser);
                 document.getElementById('userName').innerText = name;
                 document.getElementById('authScreen').classList.add('hidden');
                 document.getElementById('contentArea').classList.remove('hidden');
                 document.getElementById('menuBtn').classList.remove('hidden');
-            } else { alert("بيانات خاطئة!"); }
+                saveToAdmin('users', currentUser);
+            } else { alert("خطأ في البيانات!"); }
         }
 
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            sidebar.classList.add('translate-x-full');
-            if(id === 'vault') renderVault();
-        }
-
-        async function processPDF(event) {
-            const file = event.target.files[0];
+        async function processPDF(e) {
+            const file = e.target.files[0];
+            if(!file) return;
             const reader = new FileReader();
             reader.onload = async function() {
                 const typedarray = new Uint8Array(this.result);
@@ -163,110 +160,62 @@
                 for(let i=1; i<=pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
-                    text += content.items.map(s => s.str).join(" ") + " ";
+                    text += content.items.map(s => s.str).join(" ") + " \n ";
                 }
                 allPDFs.push({ name: file.name, text: text });
-                alert("تمت إضافة الملف للخزنة بنجاح ✅");
+                alert("تم الحفظ في الخزنة ✅");
                 renderVault();
             };
             reader.readAsArrayBuffer(file);
         }
 
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById('sidebar').classList.add('translate-x-full');
+            if(id === 'studyStats') renderStats();
+            if(id === 'examHistory') renderHistory();
+        }
+
         function renderVault() {
-            const list = document.getElementById('vaultList');
-            list.innerHTML = allPDFs.map((pdf, i) => `
-                <div onclick="openPDFFromVault(${i})" class="glass p-4 rounded-xl flex justify-between cursor-pointer hover:border-blue-500 transition">
-                    <span>📄 ${pdf.name}</span>
-                    <span class="text-blue-400 text-xs font-bold">بدء المذاكرة ←</span>
+            document.getElementById('vaultList').innerHTML = allPDFs.map((p, i) => `
+                <div onclick="openPDF(${i})" class="glass p-4 rounded-xl cursor-pointer hover:border-blue-500">
+                    📄 ${p.name}
                 </div>
             `).join('');
         }
 
-        function openPDFFromVault(idx) {
+        function openPDF(idx) {
             showSection('mainDashboard');
             const pdf = allPDFs[idx];
-            document.getElementById('displayArea').classList.remove('hidden');
             const words = pdf.text.split(/\s+/);
-            document.getElementById('pdfView').innerHTML = words.map(w => `<span onclick="translate(this)" class="cursor-pointer hover:text-blue-400">${w} </span>`).join('');
+            document.getElementById('pdfView').innerHTML = words.map(w => `<span class="word-span" onclick="trans(this)">${w} </span>`).join('');
         }
 
-        async function translate(el) {
+        async function trans(el) {
             const word = el.innerText.trim();
-            const side = document.getElementById('sideAction');
-            side.innerHTML = "جاري الترجمة...";
+            if(word.length < 2) return;
+            document.querySelectorAll('.translation-popup').forEach(p => p.remove());
+            const p = document.createElement('div');
+            p.className = 'translation-popup'; p.innerText = "...";
+            el.appendChild(p);
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
                 method: "POST",
-                body: JSON.stringify({ contents: [{ parts: [{ text: `Translate to Arabic: ${word}` }] }] })
+                body: JSON.stringify({ contents: [{ parts: [{ text: `Translate: ${word} to Arabic` }] }] })
             });
             const data = await res.json();
-            side.innerHTML = `<div class='p-4 bg-blue-600/10 rounded-xl'><h4 class='font-bold text-blue-400'>${word}</h4><p class='text-2xl mt-2'>${data.candidates[0].content.parts[0].text}</p></div>`;
-        }
-
-        // لوحة الادمن
-        function showAdminPrompt() {
-            const p = prompt("أدخل كلمة سر الإدارة:");
-            if(p === ADMIN_PASS) {
-                showSection('adminPanel');
-                renderAdminData();
-            } else { alert("كلمة سر خاطئة!"); }
-        }
-
-        function saveUser(user) {
-            let users = JSON.parse(localStorage.getItem('sobky_users') || "[]");
-            if(!users.find(u => u.phone === user.phone)) {
-                users.push(user);
-                localStorage.setItem('sobky_users', JSON.stringify(users));
-            }
-        }
-
-        function setRating(n) {
-            currentRating = n;
-            const stars = document.querySelectorAll('.star-rating');
-            stars.forEach((s, i) => s.classList.toggle('active', i < n));
-        }
-
-        function submitReport() {
-            const report = {
-                user: currentUser.name,
-                issue: document.getElementById('issueDesc').value,
-                sugg: document.getElementById('suggestionDesc').value,
-                rate: currentRating
-            };
-            let reports = JSON.parse(localStorage.getItem('sobky_reports') || "[]");
-            reports.push(report);
-            localStorage.setItem('sobky_reports', JSON.stringify(reports));
-            alert("تم إرسال بلاغك للإدارة بنجاح");
-            showSection('mainDashboard');
-        }
-
-        function renderAdminData() {
-            const users = JSON.parse(localStorage.getItem('sobky_users') || "[]");
-            const reports = JSON.parse(localStorage.getItem('sobky_reports') || "[]");
-            
-            document.getElementById('countUsers').innerText = users.length;
-            document.getElementById('adminUsersList').innerHTML = users.map(u => `
-                <div class="p-2 border-b border-gray-800">👤 ${u.name} | 🆔 ${u.id} | 📱 ${u.phone}</div>
-            `).join('');
-            
-            document.getElementById('adminReportsList').innerHTML = reports.map(r => `
-                <div class="p-3 bg-white/5 rounded-lg mb-2">
-                    <p class="text-blue-400 font-bold">من: ${r.user} | تقييم: ${r.rate}⭐</p>
-                    <p class="text-red-400 text-xs">مشكلة: ${r.issue}</p>
-                    <p class="text-green-400 text-xs">اقتراح: ${r.sugg}</p>
-                </div>
-            `).join('');
+            p.innerText = data.candidates[0].content.parts[0].text;
         }
 
         async function startMode(mode) {
-            if(allPDFs.length === 0) return alert("ارفع ملفاً أولاً!");
-            const side = document.getElementById('sideAction');
-            document.getElementById('displayArea').classList.remove('hidden');
+            if(allPDFs.length === 0) return alert("ارفع ملف أولاً");
+            const side = document.getElementById('sideContent');
+            const count = mode === 'comprehensive' ? 30 : 10;
+            examStartTime = Date.now();
+            side.innerHTML = `<div class="loader"></div><p>يتم إنشاء ${count} سؤال من ملفاتك...</p>`;
             
-            let text = (mode === 'comprehensive') ? allPDFs.map(p => p.text).join(" ") : allPDFs[allPDFs.length-1].text;
-            let count = (mode === 'comprehensive') ? 30 : 10;
-            
-            side.innerHTML = `جاري توليد ${count} سؤال...`;
-            const prompt = `Text: "${text.substring(0, 4000)}". Generate ${count} MCQ in Arabic. JSON: [{"q":"..","o":["..","..","..",".."],"a":index}]`;
+            const txt = mode === 'comprehensive' ? allPDFs.map(p => p.text).join(" ") : allPDFs[allPDFs.length-1].text;
+            const prompt = `Based on: "${txt.substring(0, 4000)}", generate ${count} MCQ in Arabic. JSON: [{"q":"..","o":["..","..","..",".."],"a":index}]`;
             
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
@@ -274,33 +223,88 @@
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
                 const data = await res.json();
-                const questions = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, ""));
+                const qs = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, ""));
                 
                 let cur = 0, score = 0;
                 const renderQ = () => {
-                    const q = questions[cur];
+                    const q = qs[cur];
                     side.innerHTML = `
                         <div class="text-right">
-                            <h3 class="font-bold mb-4">${q.q}</h3>
-                            ${q.o.map((o, i) => `<button onclick="checkAns(${i},${q.a},this)" class="option-btn">${o}</button>`).join('')}
-                            <button id="nextBtn" disabled onclick="nextQ()" class="w-full mt-4 bg-white text-black py-2 rounded-xl opacity-20">التالي</button>
+                            <h3 class="font-bold mb-4 text-sm">${q.q}</h3>
+                            ${q.o.map((o, i) => `<button onclick="check(${i},${q.a},this)" class="option-btn text-xs">${o}</button>`).join('')}
+                            <button id="nxt" disabled onclick="nxtQ()" class="w-full bg-white text-black py-2 rounded-xl opacity-20 font-bold">السؤال التالي</button>
                         </div>
                     `;
                 };
-                window.checkAns = (idx, ans, btn) => {
+                window.check = (i, a, b) => {
                     const btns = document.querySelectorAll('.option-btn');
-                    btns.forEach(b => b.disabled = true);
-                    if(idx === ans) { btn.classList.add('correct'); score++; }
-                    else { btn.classList.add('wrong'); btns[ans].classList.add('correct'); }
-                    document.getElementById('nextBtn').disabled = false;
-                    document.getElementById('nextBtn').style.opacity = "1";
+                    btns.forEach(x => x.disabled = true);
+                    if(i === a) { b.classList.add('correct'); score++; }
+                    else { b.classList.add('wrong'); btns[a].classList.add('correct'); }
+                    document.getElementById('nxt').disabled = false; document.getElementById('nxt').style.opacity = "1";
                 };
-                window.nextQ = () => {
-                    cur++; if(cur < count) renderQ();
-                    else side.innerHTML = `<h2 class='text-4xl text-center font-bold'>${score}/${count}</h2>`;
+                window.nxtQ = () => {
+                    cur++;
+                    if(cur < count) renderQ();
+                    else {
+                        const duration = Math.floor((Date.now() - examStartTime)/1000);
+                        const examResult = { score: `${score}/${count}`, type: mode === 'comprehensive' ? 'شامل' : 'عادي', time: duration + ' ثانية', date: new Date().toLocaleString('ar-EG') };
+                        saveToUser('exams', examResult);
+                        side.innerHTML = `<h2 class="text-4xl font-bold">${score}/${count}</h2><p>تم حفظ النتيجة في سجلك</p>`;
+                    }
                 };
                 renderQ();
-            } catch(e) { side.innerHTML = "حدث خطأ في جلب الأسئلة."; }
+            } catch(e) { side.innerHTML = "حدث خطأ في توليد الأسئلة."; }
+        }
+
+        function saveToUser(key, val) {
+            let data = JSON.parse(localStorage.getItem(`user_${currentUser.phone}_${key}`) || "[]");
+            data.push(val);
+            localStorage.setItem(`user_${currentUser.phone}_${key}`, JSON.stringify(data));
+        }
+
+        function saveToAdmin(key, val) {
+            let data = JSON.parse(localStorage.getItem(`admin_${key}`) || "[]");
+            data.push({ ...val, fromUser: currentUser?.name || 'مجهول' });
+            localStorage.setItem(`admin_${key}`, JSON.stringify(data));
+        }
+
+        function renderStats() {
+            // حفظ الجلسة الحالية عند الفتح
+            saveToUser('stats', { date: new Date().toLocaleDateString('ar-EG'), duration: document.getElementById('sessionTimer').innerText });
+            const stats = JSON.parse(localStorage.getItem(`user_${currentUser.phone}_stats`) || "[]");
+            document.getElementById('statsBody').innerHTML = stats.map(s => `<tr><td class="p-2">${s.date}</td><td class="p-2">${s.duration}</td></tr>`).join('');
+        }
+
+        function renderHistory() {
+            const exams = JSON.parse(localStorage.getItem(`user_${currentUser.phone}_exams`) || "[]");
+            document.getElementById('historyList').innerHTML = exams.map(e => `
+                <div class="glass p-4 rounded-xl text-xs flex justify-between items-center">
+                    <div><span class="font-bold text-orange-400">${e.score}</span> | نوع: ${e.type}</div>
+                    <div class="text-[10px] text-gray-500">${e.date} (${e.time})</div>
+                </div>
+            `).join('');
+        }
+
+        function showAdminPrompt() {
+            if(prompt("باسورد الادمن:") === "1542") {
+                showSection('adminPanel');
+                const users = JSON.parse(localStorage.getItem('admin_users') || "[]");
+                const reports = JSON.parse(localStorage.getItem('admin_reports') || "[]");
+                document.getElementById('adminData').innerHTML = `
+                    <div class="glass p-4 rounded-xl"><h3>الطلاب (${users.length})</h3><div class="space-y-2 text-[10px] mt-4">${users.map(u => `<p>• ${u.name} - ${u.phone}</p>`).join('')}</div></div>
+                    <div class="glass p-4 rounded-xl"><h3>البلاغات</h3><div class="space-y-2 text-[10px] mt-4">${reports.map(r => `<p>• ${r.fromUser}: ${r.msg} (${r.rate}★)</p>`).join('')}</div></div>
+                    <div class="glass p-4 rounded-xl"><h3>إحصائيات</h3><p>إجمالي الجلسات: ${JSON.parse(localStorage.getItem('admin_users') || "[]").length}</p></div>
+                `;
+            } else alert("خطأ!");
+        }
+
+        document.getElementById('menuBtn').onclick = () => document.getElementById('sidebar').classList.toggle('translate-x-full');
+        function setRate(n) { rating = n; document.querySelectorAll('.star').forEach((s,i) => s.style.color = i < n ? '#f2c94c' : '#30363d'); }
+        function sendMsg() { 
+            saveToAdmin('reports', { msg: document.getElementById('msg').value, rate: rating }); 
+            alert("تم الإرسال"); 
+            showSection('mainDashboard'); 
         }
     </script>
 </body>
