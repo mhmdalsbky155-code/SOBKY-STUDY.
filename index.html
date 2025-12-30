@@ -3,232 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة السبكي التعليمية | Sobky AI Pro</title>
+    <title>Sobky AI - المستقر النهائي</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #010409; color: #e6edf3; overflow: hidden; }
-        .glass { background: rgba(13, 17, 23, 0.98); backdrop-filter: blur(25px); border: 1px solid #30363d; }
-        .full-page { position: fixed; inset: 0; z-index: 500; background: #010409; display: none; flex-direction: column; }
-        .sidebar { transition: 0.3s; z-index: 1000; }
-        .option-btn { background: #21262d; border: 1px solid #30363d; width: 100%; padding: 1.2rem; border-radius: 1.5rem; text-align: right; margin-bottom: 0.8rem; }
+        body { font-family: 'Cairo', sans-serif; background: #0d1117; color: #e6edf3; overflow-x: hidden; }
+        .glass { background: rgba(22, 27, 34, 0.95); backdrop-filter: blur(10px); border: 1px solid #30363d; }
+        .full-page { position: fixed; inset: 0; z-index: 1000; background: #0d1117; display: none; flex-direction: column; }
+        .pdf-canvas-container { flex: 1; overflow-y: auto; background: #525659; display: flex; flex-direction: column; align-items: center; padding: 10px; }
+        canvas { margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); max-width: 100%; height: auto !important; }
+        .option-btn { background: #21262d; border: 1px solid #30363d; width: 100%; padding: 1rem; border-radius: 1rem; text-align: right; margin-bottom: 0.6rem; transition: 0.2s; }
         .correct { background: #238636 !important; border-color: #2ea043 !important; }
         .wrong { background: #da3633 !important; border-color: #f85149 !important; }
-        .loader { width: 60px; height: 60px; border: 6px solid #30363d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
+        .loader { width: 40px; height: 40px; border: 4px solid #30363d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        iframe { width: 100%; height: 100%; border: none; background: #525659; }
     </style>
 </head>
 <body>
 
-    <button id="menuBtn" class="fixed top-6 right-6 z-[1100] bg-blue-600 p-3 rounded-2xl hidden shadow-2xl">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-    </button>
-    <div id="sidebar" class="fixed inset-y-0 right-0 w-80 glass sidebar transform translate-x-full p-8 shadow-2xl text-right">
-        <h2 class="text-2xl font-bold mb-10 text-blue-500 italic border-b border-gray-700 pb-4">Sobky Admin</h2>
-        <nav class="space-y-6 font-bold">
-            <button onclick="adminAuth()" class="w-full text-right hover:text-blue-400">👤 لوحة الإدارة</button>
-            <button onclick="openTab('statsPage')" class="w-full text-right hover:text-blue-400">⏱ ساعات المذاكرة</button>
-            <button onclick="openTab('historyPage')" class="w-full text-right hover:text-blue-400">📊 سجل الاختبارات</button>
-            <button onclick="openTab('vaultPage')" class="w-full text-right text-green-400">📦 الخزنة</button>
-            <button onclick="location.reload()" class="w-full text-right text-red-500 mt-20">🚪 تسجيل الخروج</button>
-        </nav>
-        <div class="absolute bottom-10 left-8 right-8 p-5 bg-blue-900/20 rounded-[2rem] text-center border border-blue-800/30">
-            <div id="sessionTimer" class="text-3xl font-bold text-blue-400">00:00:00</div>
-        </div>
-    </div>
-
-    <div id="loginScreen" class="fixed inset-0 z-[1200] flex items-center justify-center bg-[#010409] p-4 text-right">
-        <div class="glass p-10 rounded-[3rem] w-full max-w-md border-t-8 border-blue-600 shadow-2xl">
-            <h1 class="text-5xl font-bold text-center mb-10 text-blue-500 italic">Sobky</h1>
-            <div class="space-y-4">
-                <input type="text" id="nameInp" placeholder="الاسم الكامل" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-2xl outline-none">
-                <input type="text" id="idInp" placeholder="الرقم التعريفي (ID)" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-2xl outline-none">
-                <input type="tel" id="phoneInp" placeholder="رقم الهاتف" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-2xl outline-none">
-                <input type="password" id="passInp" placeholder="كلمة المرور" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-2xl outline-none">
-                <button onclick="doLogin()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold text-xl active:scale-95 shadow-lg">دخول</button>
+    <div id="authBox" class="fixed inset-0 z-[2000] flex items-center justify-center bg-[#0d1117] p-4">
+        <div class="glass p-8 rounded-[2rem] w-full max-w-md shadow-2xl">
+            <h1 class="text-3xl font-bold text-center mb-8 text-blue-500 italic">Sobky AI</h1>
+            <div class="space-y-4 text-right">
+                <input type="text" id="nameInp" placeholder="الاسم الكامل" class="w-full bg-[#010409] border border-[#30363d] p-4 rounded-xl outline-none">
+                <input type="password" id="passInp" placeholder="كلمة السر" class="w-full bg-[#010409] border border-[#30363d] p-4 rounded-xl outline-none">
+                <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-xl font-bold active:scale-95 transition">دخول المنصة</button>
             </div>
         </div>
     </div>
 
-    <div id="mainDash" class="p-6 pt-24 max-w-6xl mx-auto hidden text-right">
-        <div class="glass p-6 rounded-3xl mb-10 flex justify-between items-center shadow-lg">
-            <div>مرحباً، <span id="uDisplayName" class="text-blue-400 font-bold"></span></div>
-            <button onclick="document.getElementById('pdfInp').click()" class="bg-blue-600 px-6 py-2 rounded-xl text-sm font-bold shadow-lg">+ رفع ملف PDF</button>
-            <input type="file" id="pdfInp" class="hidden" accept=".pdf" onchange="uploadPDF(event)">
+    <div id="dash" class="hidden p-6 pt-20 max-w-5xl mx-auto text-right">
+        <div class="glass p-6 rounded-3xl mb-8 flex justify-between items-center shadow-lg">
+            <div>أهلاً، <span id="uName" class="text-blue-400 font-bold"></span></div>
+            <button onclick="document.getElementById('pdfUp').click()" class="bg-blue-600 px-6 py-2 rounded-xl text-sm font-bold">+ رفع PDF</button>
+            <input type="file" id="pdfUp" class="hidden" accept=".pdf" onchange="handlePDF(event)">
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div onclick="openTab('studyPage')" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-4 border-b-8 border-blue-500 cursor-pointer active:scale-95 transition">
-                <span class="text-5xl">📖</span><span class="text-xl font-bold">صفحة المذاكرة</span>
-            </div>
-            <div onclick="startExam(10)" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-4 border-b-8 border-orange-500 cursor-pointer active:scale-95 transition">
-                <span class="text-5xl">📝</span><span class="text-xl font-bold">امتحان (10س)</span>
-            </div>
-            <div onclick="startExam(30)" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-4 border-b-8 border-purple-500 cursor-pointer active:scale-95 transition">
-                <span class="text-5xl">🏆</span><span class="text-xl font-bold">امتحان شامل</span>
-            </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button onclick="openStudy()" class="glass p-8 rounded-[2rem] border-b-8 border-blue-500 active:scale-95 transition flex flex-col items-center gap-4">
+                <span class="text-5xl">📖</span><span class="font-bold">وضع المذاكرة</span>
+            </button>
+            <button onclick="startQuiz(10)" class="glass p-8 rounded-[2rem] border-b-8 border-orange-500 active:scale-95 transition flex flex-col items-center gap-4">
+                <span class="text-5xl">📝</span><span class="font-bold">امتحان (10س)</span>
+            </button>
+            <button onclick="startQuiz(30)" class="glass p-8 rounded-[2rem] border-b-8 border-purple-500 active:scale-95 transition flex flex-col items-center gap-4">
+                <span class="text-5xl">🏆</span><span class="font-bold">امتحان شامل</span>
+            </button>
         </div>
     </div>
 
     <div id="studyPage" class="full-page">
-        <div class="flex flex-col h-full">
-            <div class="p-4 glass flex justify-between items-center border-b border-gray-800">
-                <button onclick="closeTab('studyPage')" class="bg-red-500 px-6 py-2 rounded-xl font-bold">خروج</button>
-                <div class="flex gap-2">
-                    <input type="text" id="transWord" placeholder="كلمة لترجمتها..." class="bg-black/50 border border-gray-700 px-4 py-2 rounded-xl text-sm outline-none">
-                    <button onclick="quickTranslate()" class="bg-blue-600 px-4 py-2 rounded-xl font-bold text-xs">ترجم</button>
-                </div>
+        <div class="p-4 glass flex justify-between items-center z-[1100]">
+            <button onclick="closePage('studyPage')" class="bg-red-600 px-6 py-2 rounded-xl font-bold">خروج</button>
+            <div class="flex gap-2">
+                <input type="text" id="tWord" placeholder="كلمة للترجمة..." class="bg-[#010409] border border-[#30363d] px-4 py-2 rounded-xl text-sm outline-none w-32">
+                <button onclick="translateNow()" class="bg-blue-600 px-4 py-2 rounded-xl font-bold text-xs">ترجم</button>
             </div>
-            <div class="flex-1 bg-[#525659]">
-                <iframe id="pdfFrame"></iframe>
-            </div>
-            <div id="transResult" class="p-4 glass text-center font-bold text-blue-400 min-h-[60px] text-lg">الترجمة الطبية ستظهر هنا...</div>
         </div>
+        <div id="pdfContainer" class="pdf-canvas-container">
+            <p id="pdfStatus" class="mt-20">جاري معالجة الصفحات...</p>
+        </div>
+        <div id="tResult" class="p-4 glass text-center font-bold text-blue-400 min-h-[60px] shadow-2xl">الترجمة ستظهر هنا</div>
     </div>
 
-    <div id="examPage" class="full-page flex flex-col items-center justify-center p-6">
-        <div class="w-full max-w-2xl glass p-10 rounded-[3rem] shadow-2xl relative">
-            <button onclick="closeTab('examPage')" class="absolute top-6 left-6 text-gray-500">خروج</button>
-            <div id="examMain" class="text-center"></div>
+    <div id="quizPage" class="full-page items-center justify-center p-4">
+        <div class="w-full max-w-xl glass p-8 rounded-[2.5rem] relative">
+            <button onclick="closePage('quizPage')" class="absolute top-4 left-4 text-gray-500 text-sm">إغلاق</button>
+            <div id="quizContent" class="text-center"></div>
         </div>
     </div>
-
-    <div id="vaultPage" class="full-page p-10 text-right"><h2 class="text-3xl mb-10 font-bold">📦 الخزنة</h2><div id="vList" class="grid gap-4"></div><button onclick="closeTab('vaultPage')" class="mt-10 text-gray-500">رجوع</button></div>
-    <div id="statsPage" class="full-page p-10 text-right"><h2 class="text-3xl mb-10 font-bold">⏱ الساعات</h2><div id="sList" class="grid gap-4"></div><button onclick="closeTab('statsPage')" class="mt-10 text-gray-500">رجوع</button></div>
-    <div id="historyPage" class="full-page p-10 text-right"><h2 class="text-3xl mb-10 font-bold">📊 سجل الامتحانات</h2><div id="hList" class="grid gap-4"></div><button onclick="closeTab('historyPage')" class="mt-10 text-gray-500">رجوع</button></div>
-    <div id="adminPage" class="full-page p-10 text-right text-red-500"><h2 class="text-3xl mb-10 font-bold">🛠 الإدارة</h2><div id="aList" class="grid gap-4 text-white text-sm"></div><button onclick="closeTab('adminPage')" class="mt-10 text-gray-500">خروج</button></div>
 
     <script>
         const API_KEY = "AIzaSyC1BwXz-nHSiFfxh5ux5Y6RexU0FqlD9do";
-        let user = null, files = [], secs = 0;
+        let pdfDocs = [], currentDoc = null, fullText = "";
 
-        setInterval(() => { if(user) { secs++; updateT(); } }, 1000);
-        function updateT() {
-            const h = Math.floor(secs/3600).toString().padStart(2,'0');
-            const m = Math.floor((secs%3600)/60).toString().padStart(2,'0');
-            const s = (secs%60).toString().padStart(2,'0');
-            document.getElementById('sessionTimer').innerText = `${h}:${m}:${s}`;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        function login() {
+            if(document.getElementById('passInp').value === "elsobky12222") {
+                document.getElementById('uName').innerText = document.getElementById('nameInp').value;
+                document.getElementById('authBox').style.display = 'none';
+                document.getElementById('dash').style.display = 'block';
+            } else alert("الباسورد خطأ!");
         }
 
-        function doLogin() {
-            const n = document.getElementById('nameInp').value, p = document.getElementById('passInp').value;
-            if(p === "elsobky12222" && n.length > 2) {
-                user = { name: n, ph: document.getElementById('phoneInp').value, id: document.getElementById('idInp').value };
-                document.getElementById('uDisplayName').innerText = n;
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainDash').style.display = 'block';
-                document.getElementById('menuBtn').style.display = 'block';
-                saveLocal('adm_u', user);
-            } else alert("بيانات خاطئة!");
-        }
-
-        async function uploadPDF(e) {
+        async function handlePDF(e) {
             const file = e.target.files[0]; if(!file) return;
-            const url = URL.createObjectURL(file);
             const reader = new FileReader();
             reader.onload = async function() {
-                const typed = new Uint8Array(this.result);
-                const pdf = await pdfjsLib.getDocument(typed).promise;
+                const typedarray = new Uint8Array(this.result);
+                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                currentDoc = pdf;
                 let text = "";
                 for(let i=1; i<=pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
                     const content = await page.getTextContent();
                     text += content.items.map(s => s.str).join(" ") + " ";
                 }
-                files.push({ name: file.name, url: url, text: text.substring(0, 10000) });
-                alert("تم رفع الملف بنجاح ✅");
+                fullText = text.substring(0, 15000); // حفظ عينة للامتحانات
+                pdfDocs.push({ name: file.name, doc: pdf });
+                alert("تم تحميل " + file.name + " بنجاح!");
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function openTab(id) {
-            if((id==='studyPage' || id==='examPage') && files.length === 0) return alert("الخزنة فارغة!");
-            document.querySelectorAll('.full-page').forEach(p => p.style.display = 'none');
-            document.getElementById(id).style.display = 'flex';
-            document.getElementById('sidebar').classList.add('translate-x-full');
-            if(id === 'studyPage') document.getElementById('pdfFrame').src = files[files.length-1].url;
-            if(id === 'vaultPage') renderV();
-            if(id === 'statsPage') renderS();
-            if(id === 'historyPage') renderH();
+        async function openStudy() {
+            if(!currentDoc) return alert("ارفع ملف أولاً!");
+            document.getElementById('studyPage').style.display = 'flex';
+            const container = document.getElementById('pdfContainer');
+            container.innerHTML = "";
+            
+            for(let i=1; i<=currentDoc.numPages; i++) {
+                const page = await currentDoc.getPage(i);
+                const viewport = page.getViewport({ scale: 1.5 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                container.appendChild(canvas);
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+            }
         }
 
-        function closeTab(id) { document.getElementById(id).style.display = 'none'; }
+        function closePage(id) { document.getElementById(id).style.display = 'none'; }
 
-        async function quickTranslate() {
-            const w = document.getElementById('transWord').value;
-            const box = document.getElementById('transResult');
-            if(!w) return; box.innerText = "جاري الترجمة...";
+        async function translateNow() {
+            const w = document.getElementById('tWord').value;
+            if(!w) return;
+            document.getElementById('tResult').innerText = "جاري الترجمة...";
             try {
-                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
-                    method: "POST", body: JSON.stringify({ contents: [{ parts: [{ text: `Translate medical term "${w}" to Arabic.` }] }] })
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+                    method: "POST", body: JSON.stringify({ contents: [{ parts: [{ text: `Translate precisely to Arabic: "${w}"` }] }] })
                 });
-                const d = await r.json();
-                box.innerText = d.candidates[0].content.parts[0].text;
-            } catch(e) { box.innerText = "Error"; }
+                const data = await res.json();
+                document.getElementById('tResult').innerText = data.candidates[0].content.parts[0].text;
+            } catch(e) { document.getElementById('tResult').innerText = "حدث خطأ في الاتصال."; }
         }
 
-        async function startExam(count) {
-            if(files.length === 0) return alert("ارفع ملف أولاً!");
-            openTab('examPage');
-            const main = document.getElementById('examMain');
-            main.innerHTML = `<div class="loader mx-auto"></div><p>جاري تأليف الأسئلة...</p>`;
-            const source = count === 30 ? files.map(f => f.text).join(" ") : files[files.length-1].text;
-            const cleaned = source.substring(0, 4500); 
+        async function startQuiz(count) {
+            if(!fullText) return alert("ارفع ملف أولاً!");
+            document.getElementById('quizPage').style.display = 'flex';
+            const box = document.getElementById('quizContent');
+            box.innerHTML = `<div class="loader mx-auto"></div><p>جاري توليد الأسئلة بذكاء...</p>`;
+            
+            // تنظيف النص الطبي لضمان النجاح
+            const cleanText = fullText.replace(/[^\w\s\u0600-\u06FF]/g, ' ').substring(0, 4000);
 
-            const prompt = `Based on: "${cleaned}", generate ${count} MCQ in Arabic. JSON array only: [{"q":"..","o":["..","..","..",".."],"a":index}]`;
+            const prompt = `Based on: "${cleanText}", generate ${count} MCQ in Arabic. Format strictly as JSON array ONLY: [{"q":"..","o":["..","..","..",".."],"a":index}]`;
             
             try {
-                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
                     method: "POST", body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
-                const d = await r.json();
-                const qs = JSON.parse(d.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim());
+                const data = await res.json();
+                const jsonText = data.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim();
+                const qs = JSON.parse(jsonText);
+                
                 let cur = 0, score = 0;
-                const showQ = () => {
+                const renderQ = () => {
                     const q = qs[cur];
-                    main.innerHTML = `
+                    box.innerHTML = `
                         <div class="text-right">
-                            <span class="bg-blue-600 px-3 py-1 rounded-full text-xs font-bold mb-6 inline-block">سؤال ${cur+1}/${count}</span>
-                            <h3 class="font-bold text-xl mb-10 leading-relaxed">${q.q}</h3>
-                            <div class="space-y-3">${q.o.map((o, i) => `<button onclick="checkAns(${i}, ${q.a}, this)" class="option-btn">${o}</button>`).join('')}</div>
-                            <button id="nxtB" disabled onclick="nextQ()" class="w-full mt-10 bg-white text-black py-4 rounded-2xl font-bold opacity-20">السؤال التالي</button>
+                            <span class="bg-blue-600 px-3 py-1 rounded-full text-xs font-bold mb-4 inline-block">سؤال ${cur+1}/${count}</span>
+                            <h3 class="font-bold text-lg mb-8 leading-relaxed">${q.q}</h3>
+                            <div class="space-y-3">${q.o.map((o, i) => `<button onclick="check(${i}, ${q.a}, this)" class="option-btn text-sm">${o}</button>`).join('')}</div>
+                            <button id="nxtBtn" disabled onclick="nextQ()" class="w-full mt-10 bg-white text-black py-4 rounded-2xl font-bold opacity-20">السؤال التالي</button>
                         </div>
                     `;
                 };
-                window.checkAns = (i, a, btn) => {
+                window.check = (i, a, btn) => {
                     const btns = document.querySelectorAll('.option-btn'); btns.forEach(b => b.disabled = true);
-                    if(i === a) { btn.classList.add('correct'); score++; } else { btn.classList.add('wrong'); btns[a].classList.add('correct'); }
-                    document.getElementById('nxtB').disabled = false; document.getElementById('nxtB').style.opacity = "1";
+                    if(i === a) { btn.classList.add('correct'); score++; }
+                    else { btn.classList.add('wrong'); btns[a].classList.add('correct'); }
+                    document.getElementById('nxtBtn').disabled = false; document.getElementById('nxtBtn').style.opacity = "1";
                 };
                 window.nextQ = () => {
-                    cur++; if(cur < count) showQ();
-                    else {
-                        saveLocal('h_ex', { score: `${score}/${count}`, date: new Date().toLocaleString() });
-                        main.innerHTML = `<h2 class="text-7xl font-bold mb-6">${score}/${count}</h2><button onclick="closeTab('examPage')" class="bg-blue-600 px-10 py-3 rounded-2xl font-bold">خروج</button>`;
-                    }
+                    cur++; if(cur < count) renderQ();
+                    else box.innerHTML = `<h2 class="text-6xl font-bold mb-6">${score}/${count}</h2><button onclick="closePage('quizPage')" class="bg-blue-600 px-10 py-3 rounded-2xl font-bold">العودة</button>`;
                 };
-                showQ();
-            } catch(e) { main.innerHTML = "فشل توليد الأسئلة. حاول بملف أصغر."; }
+                renderQ();
+            } catch(e) { box.innerHTML = "<p class='text-red-500'>فشل إنشاء الأسئلة. تأكد من جودة الملف أو حاول مرة أخرى.</p>"; }
         }
-
-        function adminAuth() { if(prompt("الباسورد:") === "1542") { openTab('adminPage'); renderA(); } else alert("خطأ!"); }
-        function saveLocal(k, v) { let d = JSON.parse(localStorage.getItem(k) || "[]"); d.push(v); localStorage.setItem(k, JSON.stringify(d)); }
-        function renderV() { document.getElementById('vList').innerHTML = files.map(f => `<div class="glass p-4 rounded-xl">📄 ${f.name}</div>`).join(''); }
-        function renderS() {
-            saveLocal('h_st', { date: new Date().toLocaleDateString(), time: document.getElementById('sessionTimer').innerText });
-            const s = JSON.parse(localStorage.getItem('h_st') || "[]");
-            document.getElementById('sList').innerHTML = s.reverse().map(x => `<div class="glass p-4 rounded-xl flex justify-between"><span>${x.date}</span><b>${x.time}</b></div>`).join('');
-        }
-        function renderH() {
-            const h = JSON.parse(localStorage.getItem('h_ex') || "[]");
-            document.getElementById('hList').innerHTML = h.reverse().map(x => `<div class="glass p-4 rounded-xl flex justify-between items-center"><span class="text-orange-400 font-bold">${x.score}</span><small class="text-[10px]">${x.date}</small></div>`).join('');
-        }
-        function renderA() {
-            const u = JSON.parse(localStorage.getItem('adm_u') || "[]");
-            document.getElementById('aList').innerHTML = u.map(x => `<div>👤 ${x.name} - 📞 ${x.ph}</div>`).join('');
-        }
-        document.getElementById('menuBtn').onclick = () => document.getElementById('sidebar').classList.toggle('translate-x-full');
     </script>
 </body>
-</html>
+</html> 
