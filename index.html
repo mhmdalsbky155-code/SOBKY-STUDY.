@@ -3,298 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة السبكي التعليمية | Sobky Edu</title>
+    <title>منصة السبكي التعليمية v5.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #010409; color: #e6edf3; overflow-x: hidden; }
-        .glass { background: rgba(13, 17, 23, 0.98); backdrop-filter: blur(20px); border: 1px solid #30363d; }
-        .sidebar { transition: transform 0.3s; z-index: 1000; }
-        .word-span { cursor: pointer; position: relative; display: inline-block; padding: 0 2px; }
-        .word-span:hover { background: rgba(88, 166, 255, 0.2); border-radius: 4px; }
-        .highlight { background: #f2c94c; color: #000; border-radius: 4px; }
-        .translation-popup { position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%); background: #58a6ff; color: white; padding: 8px 15px; border-radius: 12px; font-size: 14px; z-index: 2000; white-space: nowrap; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
-        .option-btn { background: #21262d; border: 1px solid #30363d; width: 100%; padding: 1.2rem; border-radius: 1.2rem; text-align: right; margin-bottom: 0.8rem; transition: 0.3s; }
-        .correct { background: #238636 !important; border-color: #2ea043 !important; }
-        .wrong { background: #da3633 !important; border-color: #f85149 !important; }
-        .loader { width: 40px; height: 40px; border: 4px solid #30363d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 1s linear infinite; display: inline-block; }
+        body { font-family: 'Cairo', sans-serif; background: #010409; color: #e6edf3; overflow: hidden; }
+        .glass { background: rgba(13, 17, 23, 0.98); backdrop-filter: blur(15px); border: 1px solid #30363d; }
+        .full-page { position: fixed; inset: 0; z-index: 500; background: #010409; display: none; flex-direction: column; overflow-y: auto; }
+        .pdf-viewer-container { flex: 1; height: 80vh; border: 2px solid #30363d; border-radius: 20px; overflow: hidden; margin: 10px; }
+        .word-span { cursor: pointer; display: inline-block; padding: 0 2px; transition: 0.2s; border-radius: 4px; }
+        .word-span:hover { background: rgba(88, 166, 255, 0.3); color: #58a6ff; }
+        .translation-popup { position: absolute; background: #58a6ff; color: white; padding: 8px 15px; border-radius: 12px; font-size: 14px; z-index: 3000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-weight: bold; }
+        .loader { width: 50px; height: 50px; border: 5px solid #30363d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .full-page { position: fixed; inset: 0; z-index: 500; background: #010409; overflow-y: auto; padding: 20px; display: none; }
-        .hidden { display: none; }
+        .option-btn { background: #21262d; border: 1px solid #30363d; width: 100%; padding: 1.2rem; border-radius: 1.5rem; text-align: right; margin-bottom: 0.8rem; }
+        .correct { background: #238636 !important; }
+        .wrong { background: #da3633 !important; }
     </style>
 </head>
 <body>
 
-    <button id="menuBtn" class="fixed top-5 right-5 z-[1100] bg-blue-600 p-2 rounded-lg hidden shadow-xl">
+    <button id="menuBtn" class="fixed top-6 right-6 z-[1100] bg-blue-600 p-3 rounded-2xl hidden shadow-2xl">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
     </button>
-    
-    <div id="sidebar" class="fixed inset-y-0 right-0 w-72 glass sidebar transform translate-x-full p-6 shadow-2xl">
-        <h2 class="text-xl font-bold mb-8 text-blue-400 border-b border-gray-700 pb-2 italic">Sobky Control</h2>
+    <div id="sidebar" class="fixed inset-y-0 right-0 w-80 glass transform translate-x-full p-8 shadow-2xl z-[1050] transition-transform duration-300">
+        <h2 class="text-2xl font-bold mb-10 text-blue-500 italic border-b border-gray-800 pb-4 text-right">Sobky AI</h2>
         <nav class="space-y-6 text-right font-bold">
-            <button onclick="showAdminPrompt()" class="w-full text-right hover:text-blue-400">👤 لوحة الإدارة</button>
-            <button onclick="showSection('studyStats')" class="w-full text-right hover:text-blue-400">⏱ ساعات المذاكرة</button>
-            <button onclick="showSection('examHistory')" class="w-full text-right hover:text-blue-400">📊 سجل الامتحانات</button>
-            <button onclick="showSection('vault')" class="w-full text-right hover:text-blue-400 text-green-400">📦 الخزنة (الملفات)</button>
-            <button onclick="location.reload()" class="w-full text-right text-red-500 mt-20">🚪 تسجيل الخروج</button>
+            <button onclick="checkAdmin()" class="w-full text-right hover:text-blue-400 flex items-center gap-3">👤 لوحة الإدارة</button>
+            <button onclick="showPage('statsPage')" class="w-full text-right hover:text-blue-400">⏱ ساعات المذاكرة</button>
+            <button onclick="showPage('historyPage')" class="w-full text-right hover:text-blue-400">📊 سجل الاختبارات</button>
+            <button onclick="showPage('vaultPage')" class="w-full text-right text-green-400">📦 الخزنة</button>
+            <button onclick="location.reload()" class="w-full text-right text-red-500 mt-20">🚪 خروج</button>
         </nav>
-        <div class="absolute bottom-10 left-6 right-6 p-4 bg-blue-900/20 rounded-2xl text-center border border-blue-800/30">
-            <p class="text-[10px] text-gray-400 mb-1">وقت المذاكرة الحالي</p>
-            <div id="sessionTimer" class="text-2xl font-bold text-blue-400">00:00:00</div>
+        <div class="absolute bottom-10 left-8 right-8 p-5 bg-blue-900/20 rounded-[2rem] text-center">
+            <p class="text-[10px] text-gray-500 mb-2">وقت الجلسة</p>
+            <div id="sessionTimer" class="text-3xl font-bold text-blue-400">00:00:00</div>
         </div>
     </div>
 
-    <div id="authScreen" class="fixed inset-0 z-[1200] flex items-center justify-center bg-[#010409] p-4 text-right">
-        <div class="glass p-8 rounded-[2.5rem] w-full max-w-md border-t-4 border-blue-600 shadow-2xl">
-            <h1 class="text-4xl font-bold text-center mb-2 italic text-blue-500">Sobky AI</h1>
-            <p class="text-center text-gray-500 text-sm mb-10">منصة التعليم الذكي المتكاملة</p>
+    <div id="loginScreen" class="fixed inset-0 z-[1200] flex items-center justify-center bg-[#010409] p-4 text-right">
+        <div class="glass p-10 rounded-[3rem] w-full max-w-md border-t-8 border-blue-600 shadow-2xl">
+            <h1 class="text-4xl font-bold text-center mb-10 text-blue-500">Sobky AI</h1>
             <div class="space-y-4">
-                <input type="text" id="uName" placeholder="الاسم الكامل" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-xl outline-none focus:border-blue-500 transition">
-                <input type="text" id="uID" placeholder="الرقم التعريفي (ID)" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-xl outline-none focus:border-blue-500 transition">
-                <input type="tel" id="uPhone" placeholder="رقم التليفون" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-xl outline-none focus:border-blue-500 transition">
-                <input type="password" id="uPass" placeholder="كلمة المرور" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-xl outline-none focus:border-blue-500 transition">
-                <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold text-lg transition-all active:scale-95 shadow-lg shadow-blue-900/30">دخول الطالب</button>
+                <input type="text" id="nameInp" placeholder="الاسم الكامل" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-2xl outline-none focus:border-blue-500">
+                <input type="tel" id="phoneInp" placeholder="رقم الهاتف" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-2xl outline-none focus:border-blue-500">
+                <input type="password" id="passInp" placeholder="كلمة المرور" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-2xl outline-none focus:border-blue-500">
+                <button onclick="handleLogin()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">دخول الطالب</button>
             </div>
         </div>
     </div>
 
-    <div id="mainDashboard" class="p-4 pt-24 max-w-6xl mx-auto hidden text-right">
-        <div class="glass p-6 rounded-3xl mb-10 flex justify-between items-center border border-white/5 shadow-lg">
+    <div id="mainDashboard" class="p-6 pt-24 max-w-6xl mx-auto hidden text-right">
+        <div class="glass p-6 rounded-3xl mb-10 flex justify-between items-center">
             <div>مرحباً، <span id="userName" class="text-blue-400 font-bold"></span></div>
-            <button onclick="document.getElementById('pdfInp').click()" class="bg-blue-600 px-6 py-2 rounded-xl text-sm font-bold shadow-lg shadow-blue-900/30 active:scale-95 transition">+ رفع ملف جديد</button>
-            <input type="file" id="pdfInp" class="hidden" accept=".pdf" onchange="processPDF(event)">
+            <button onclick="document.getElementById('pdfInp').click()" class="bg-blue-600 px-6 py-2 rounded-xl text-sm font-bold shadow-lg">+ رفع ملف</button>
+            <input type="file" id="pdfInp" class="hidden" accept=".pdf" onchange="handleUpload(event)">
         </div>
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div onclick="openSectionPage('studyPage')" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-6 cursor-pointer hover:bg-blue-500/10 border-b-8 border-blue-500 transition-all active:scale-95 group">
-                <span class="text-6xl group-hover:scale-110 transition">📖</span>
-                <span class="text-2xl font-bold">صفحة المذاكرة</span>
-                <p class="text-gray-500 text-sm text-center">ترجمة فورية وتفاعل كامل مع النص</p>
-            </div>
-            <div onclick="openSectionPage('examPage')" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-6 cursor-pointer hover:bg-orange-500/10 border-b-8 border-orange-500 transition-all active:scale-95 group">
-                <span class="text-6xl group-hover:scale-110 transition">📝</span>
-                <span class="text-2xl font-bold">امتحان ملف</span>
-                <p class="text-gray-500 text-sm text-center">10 أسئلة من آخر ملف رفعته</p>
-            </div>
-            <div onclick="openSectionPage('compPage')" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-6 cursor-pointer hover:bg-purple-500/10 border-b-8 border-purple-500 transition-all active:scale-95 group">
-                <span class="text-6xl group-hover:scale-110 transition">🏆</span>
-                <span class="text-2xl font-bold">امتحان شامل</span>
-                <p class="text-gray-500 text-sm text-center">30 سؤال من جميع ملفات الخزنة</p>
-            </div>
+            <button onclick="showPage('studyPage')" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-4 border-b-8 border-blue-500 active:scale-95 transition">
+                <span class="text-5xl">📖</span><span class="text-xl font-bold">المذاكرة</span>
+            </button>
+            <button onclick="startExam('normal')" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-4 border-b-8 border-orange-500 active:scale-95 transition">
+                <span class="text-5xl">📝</span><span class="text-xl font-bold">امتحان (10س)</span>
+            </button>
+            <button onclick="startExam('comprehensive')" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-4 border-b-8 border-purple-500 active:scale-95 transition">
+                <span class="text-5xl">🏆</span><span class="text-xl font-bold">شامل (30س)</span>
+            </button>
         </div>
     </div>
 
     <div id="studyPage" class="full-page">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-blue-400 italic">| وضع المذاكرة الذكي</h2>
-                <button onclick="closePage('studyPage')" class="bg-red-500/20 text-red-500 px-6 py-2 rounded-xl font-bold border border-red-500/20">إغلاق الصفحة</button>
+        <div class="flex justify-between items-center p-4 bg-[#0d1117] mb-4">
+            <button onclick="hidePage('studyPage')" class="bg-red-500 px-6 py-2 rounded-xl font-bold">إغلاق</button>
+            <span class="text-blue-400 font-bold">اضغط على أي كلمة للترجمة</span>
+        </div>
+        <div id="studyContent" class="glass p-10 rounded-3xl leading-[2.2] text-right text-2xl min-h-screen overflow-y-auto">
             </div>
-            <div id="studyContent" class="glass p-10 rounded-3xl leading-[2.5] text-right text-2xl min-h-screen bg-black/40 shadow-inner overflow-x-hidden">
-                </div>
-        </div>
     </div>
 
-    <div id="examPage" class="full-page">
-        <div class="max-w-3xl mx-auto mt-10">
-            <div class="flex justify-between items-center mb-10">
-                <h2 class="text-2xl font-bold text-orange-500">| اختبار المعلومات (10س)</h2>
-                <button onclick="closePage('examPage')" class="text-gray-400 underline">خروج</button>
-            </div>
-            <div id="examMain" class="glass p-8 rounded-[2.5rem] shadow-2xl min-h-[400px] flex flex-col items-center justify-center text-center">
-                </div>
-        </div>
-    </div>
-
-    <div id="compPage" class="full-page">
-        <div class="max-w-3xl mx-auto mt-10">
-            <div class="flex justify-between items-center mb-10">
-                <h2 class="text-2xl font-bold text-purple-500">| التحدي الشامل (30س)</h2>
-                <button onclick="closePage('compPage')" class="text-gray-400 underline">خروج</button>
-            </div>
-            <div id="compMain" class="glass p-8 rounded-[2.5rem] shadow-2xl min-h-[400px] flex flex-col items-center justify-center text-center">
-                </div>
-        </div>
-    </div>
-
-    <div id="vault" class="full-page">
-        <div class="max-w-4xl mx-auto mt-10">
-             <button onclick="closePage('vault')" class="mb-6 text-blue-400 font-bold">← العودة للرئيسية</button>
-             <h2 class="text-3xl font-bold mb-10">📦 خزنة ملفاتك</h2>
-             <div id="vaultList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-        </div>
-    </div>
-
-    <div id="studyStats" class="full-page">
-        <div class="max-w-2xl mx-auto mt-10">
-            <button onclick="closePage('studyStats')" class="mb-6 text-blue-400 font-bold">← رجوع</button>
-            <h2 class="text-3xl font-bold mb-10">⏱ سجل ساعات المذاكرة</h2>
-            <div id="statsList" class="space-y-4"></div>
-        </div>
-    </div>
-
-    <div id="examHistory" class="full-page">
-        <div class="max-w-2xl mx-auto mt-10 text-right">
-            <button onclick="closePage('examHistory')" class="mb-6 text-orange-400 font-bold">← رجوع</button>
-            <h2 class="text-3xl font-bold mb-10">📊 نتائجك السابقة</h2>
-            <div id="historyList" class="space-y-4"></div>
-        </div>
-    </div>
-
-    <div id="adminPanel" class="full-page">
-        <div class="max-w-5xl mx-auto mt-10">
-            <button onclick="closePage('adminPanel')" class="mb-6 text-red-500 font-bold">← خروج من الإدارة</button>
-            <h2 class="text-3xl font-bold mb-10 text-red-500">🛠 لوحة التحكم (السبكي)</h2>
-            <div id="adminData" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-        </div>
-    </div>
-
-    <div id="support" class="full-page">
-        <div class="max-w-xl mx-auto mt-20">
-            <div class="glass p-10 rounded-[2.5rem] shadow-2xl border-t-8 border-blue-600">
-                <h2 class="text-2xl font-bold mb-6 text-right font-bold">🚩 بلاغ أو اقتراح للسبكي</h2>
-                <textarea id="msg" class="w-full bg-black/40 border border-gray-700 p-5 rounded-2xl mb-4 h-40 text-right outline-none focus:border-blue-500" placeholder="اكتب مشكلتك أو فكرتك لتطوير المنصة..."></textarea>
-                <button onclick="sendMsg()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold text-lg active:scale-95 transition">إرسال التقرير الآن</button>
-                <button onclick="closePage('support')" class="w-full mt-4 text-gray-500">إلغاء</button>
-            </div>
+    <div id="examPage" class="full-page flex flex-col items-center justify-center">
+        <div class="w-full max-w-2xl glass p-10 rounded-[3rem] relative shadow-2xl">
+            <button onclick="hidePage('examPage')" class="absolute top-6 left-6 text-gray-500">خروج</button>
+            <div id="examBox" class="text-center"></div>
         </div>
     </div>
 
     <script>
         const API_KEY = "AIzaSyC1BwXz-nHSiFfxh5ux5Y6RexU0FqlD9do";
-        let currentUser = null, allPDFs = [], sessionSeconds = 0;
+        let user = null, pdfs = [], seconds = 0;
 
-        // العداد
-        setInterval(() => { if(currentUser) { sessionSeconds++; updateTimerDisplay(); } }, 1000);
-        function updateTimerDisplay() {
-            const h = Math.floor(sessionSeconds/3600).toString().padStart(2,'0');
-            const m = Math.floor((sessionSeconds%3600)/60).toString().padStart(2,'0');
-            const s = (sessionSeconds%60).toString().padStart(2,'0');
+        // عداد الوقت
+        setInterval(() => { if(user) { seconds++; updateTimer(); } }, 1000);
+        function updateTimer() {
+            const h = Math.floor(seconds/3600).toString().padStart(2,'0');
+            const m = Math.floor((seconds%3600)/60).toString().padStart(2,'0');
+            const s = (seconds%60).toString().padStart(2,'0');
             document.getElementById('sessionTimer').innerText = `${h}:${m}:${s}`;
         }
 
-        function login() {
-            const n = document.getElementById('uName').value, p = document.getElementById('uPass').value;
+        function handleLogin() {
+            const n = document.getElementById('nameInp').value, p = document.getElementById('passInp').value;
             if(p === "elsobky12222" && n.length > 2) {
-                currentUser = { name: n, phone: document.getElementById('uPhone').value, date: new Date().toLocaleString('ar-EG') };
+                user = { name: n, phone: document.getElementById('phoneInp').value };
                 document.getElementById('userName').innerText = n;
-                document.getElementById('authScreen').style.display = 'none';
-                document.getElementById('mainDashboard').classList.remove('hidden');
-                document.getElementById('menuBtn').classList.remove('hidden');
-                saveToAdmin('users', currentUser);
-            } else alert("بيانات خاطئة!");
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainDashboard').style.display = 'block';
+                document.getElementById('menuBtn').style.display = 'block';
+            } else alert("خطأ!");
         }
 
-        function openSectionPage(pageId) {
-            if(allPDFs.length === 0) return alert("الخزنة فارغة! ارفع ملف أولاً.");
-            document.getElementById(pageId).style.display = 'block';
-            if(pageId === 'studyPage') renderStudy();
-            if(pageId === 'examPage') startExam(10, 'examMain', false);
-            if(pageId === 'compPage') startExam(30, 'compMain', true);
-        }
-
-        function closePage(pageId) { document.getElementById(pageId).style.display = 'none'; }
-
-        async function processPDF(e) {
+        async function handleUpload(e) {
             const file = e.target.files[0]; if(!file) return;
             const reader = new FileReader();
             reader.onload = async function() {
                 const typedarray = new Uint8Array(this.result);
-                const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                const pdfJS = await pdfjsLib.getDocument(typedarray).promise;
                 let text = "";
-                for(let i=1; i<=pdf.numPages; i++) {
-                    const page = await pdf.getPage(i), content = await page.getTextContent();
-                    text += content.items.map(s => s.str).join(" ") + " \n ";
+                for(let i=1; i<=pdfJS.numPages; i++) {
+                    const page = await pdfJS.getPage(i);
+                    const content = await page.getTextContent();
+                    text += content.items.map(s => s.str).join(" ") + " ";
                 }
-                allPDFs.push({ name: file.name, text: text });
-                alert("تمت الإضافة بنجاح ✅");
-                renderVault();
+                pdfs.push({ name: file.name, text: text });
+                alert("تم الرفع بنجاح!");
             };
             reader.readAsArrayBuffer(file);
         }
 
-        function renderStudy() {
-            const pdf = allPDFs[allPDFs.length-1];
-            const words = pdf.text.split(/\s+/);
-            document.getElementById('studyContent').innerHTML = words.map(w => `<span class="word-span" onclick="translateMe(this)">${w} </span>`).join('');
+        function showPage(id) {
+            if(pdfs.length === 0 && id !== 'statsPage') return alert("ارفع ملف أولاً!");
+            document.getElementById(id).style.display = 'flex';
+            if(id === 'studyPage') {
+                const words = pdfs[pdfs.length-1].text.split(/\s+/);
+                document.getElementById('studyContent').innerHTML = words.map(w => `<span class="word-span" onclick="translateMe(this)">${w} </span>`).join('');
+            }
         }
+
+        function hidePage(id) { document.getElementById(id).style.display = 'none'; }
 
         async function translateMe(el) {
             const word = el.innerText.trim(); if(word.length < 2) return;
             document.querySelectorAll('.translation-popup').forEach(p => p.remove());
-            document.querySelectorAll('.highlight').forEach(h => h.classList.remove('highlight'));
-            el.classList.add('highlight');
-            const popup = document.createElement('div'); popup.className = 'translation-popup'; popup.innerText = "...";
+            const popup = document.createElement('div');
+            popup.className = 'translation-popup'; popup.innerText = "...";
             el.appendChild(popup);
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
-                    method: "POST", body: JSON.stringify({ contents: [{ parts: [{ text: `Translate "${word}" to Arabic concisely.` }] }] })
+                    method: "POST", body: JSON.stringify({ contents: [{ parts: [{ text: `Translate "${word}" to Arabic concise.` }] }] })
                 });
                 const data = await res.json();
                 popup.innerText = data.candidates[0].content.parts[0].text;
             } catch(e) { popup.innerText = "Error"; }
         }
 
-        async function startExam(count, containerId, isComp) {
-            const box = document.getElementById(containerId);
-            box.innerHTML = `<div class="loader mb-4"></div><p>جاري تأليف ${count} سؤال ذكي من محتواك...</p>`;
-            const source = isComp ? allPDFs.map(p => p.text).join(" ") : allPDFs[allPDFs.length-1].text;
-            const prompt = `Text: "${source.substring(0, 4500)}". Generate ${count} MCQ in Arabic. JSON: [{"q":"..","o":["..","..","..",".."],"a":index}]`;
+        async function startExam(type) {
+            if(pdfs.length === 0) return alert("ارفع ملف أولاً!");
+            showPage('examPage');
+            const box = document.getElementById('examBox');
+            box.innerHTML = `<div class="loader mx-auto mb-4"></div><p>جاري توليد الأسئلة...</p>`;
+            
+            const count = type === 'comprehensive' ? 30 : 10;
+            const source = type === 'comprehensive' ? pdfs.map(p => p.text).join(" ") : pdfs[pdfs.length-1].text;
+            
+            // تقسيم النص لتجنب الخطأ
+            const cleanSource = source.substring(0, 4500); 
+
+            const prompt = `Based on: "${cleanSource}", generate ${count} MCQ in Arabic. Format strictly as JSON array: [{"q":"..","o":["..","..","..",".."],"a":index}]`;
+            
             try {
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
                     method: "POST", body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
                 const data = await res.json();
-                const json = JSON.parse(data.candidates[0].content.parts[0].text.replace(/```json|```/g, ""));
+                const jsonText = data.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim();
+                const questions = JSON.parse(jsonText);
+                
                 let cur = 0, score = 0;
                 const renderQ = () => {
-                    const q = json[cur];
+                    const q = questions[cur];
                     box.innerHTML = `
-                        <div class="text-right w-full max-w-xl mx-auto">
-                            <span class="bg-blue-600 px-4 py-1 rounded-full text-xs font-bold mb-10 inline-block">سؤال ${cur+1} من ${count}</span>
-                            <h3 class="text-xl font-bold mb-10 leading-relaxed">${q.q}</h3>
-                            <div class="space-y-4">${q.o.map((o, i) => `<button onclick="checkAns(${i},${q.a},this)" class="option-btn">${o}</button>`).join('')}</div>
-                            <button id="nxt" disabled onclick="nxtQ()" class="w-full mt-10 bg-white text-black py-4 rounded-2xl font-bold opacity-20">السؤال التالي ←</button>
+                        <div class="text-right">
+                            <span class="bg-blue-600 px-3 py-1 rounded-full text-xs font-bold mb-4 inline-block">سؤال ${cur+1}/${count}</span>
+                            <h3 class="font-bold text-xl mb-8 leading-relaxed">${q.q}</h3>
+                            <div class="space-y-3">${q.o.map((o, i) => `<button onclick="checkAns(${i}, ${q.a}, this)" class="option-btn">${o}</button>`).join('')}</div>
+                            <button id="nxtBtn" disabled onclick="nextQ()" class="w-full mt-8 bg-white text-black py-4 rounded-2xl font-bold opacity-20">السؤال التالي</button>
                         </div>
                     `;
                 };
-                window.checkAns = (i, a, b) => {
-                    const btns = document.querySelectorAll('.option-btn'); btns.forEach(x => x.disabled = true);
-                    if(i === a) { b.classList.add('correct'); score++; } else { b.classList.add('wrong'); btns[a].classList.add('correct'); }
-                    document.getElementById('nxt').disabled = false; document.getElementById('nxt').style.opacity = "1";
+                window.checkAns = (i, a, btn) => {
+                    const btns = document.querySelectorAll('.option-btn'); btns.forEach(b => b.disabled = true);
+                    if(i === a) { btn.classList.add('correct'); score++; }
+                    else { btn.classList.add('wrong'); btns[a].classList.add('correct'); }
+                    document.getElementById('nxtBtn').disabled = false; document.getElementById('nxtBtn').style.opacity = "1";
                 };
-                window.nxtQ = () => {
+                window.nextQ = () => {
                     cur++; if(cur < count) renderQ();
-                    else {
-                        const result = { score: `${score}/${count}`, type: isComp?'شامل':'عادي', date: new Date().toLocaleString('ar-EG') };
-                        saveToUser('exams', result);
-                        box.innerHTML = `<h2 class="text-7xl font-bold text-blue-500 mb-6">${score}/${count}</h2><p class="text-xl mb-10">عاش يا بطل! تم حفظ النتيجة في سجلك</p><button onclick="closePage('${containerId==='examMain'?'examPage':'compPage'}')" class="bg-blue-600 px-10 py-4 rounded-2xl font-bold">العودة للرئيسية</button>`;
-                    }
+                    else box.innerHTML = `<h2 class="text-6xl font-bold mb-6">${score}/${count}</h2><button onclick="hidePage('examPage')" class="bg-blue-600 px-10 py-3 rounded-2xl font-bold">رجوع</button>`;
                 };
                 renderQ();
-            } catch(e) { box.innerHTML = "<p class='text-red-500'>حدث خطأ في توليد الأسئلة. تأكد من جودة النص في الـ PDF أو الإنترنت.</p>"; }
+            } catch(e) { box.innerHTML = "حدث خطأ. حاول بملف أصغر أو تأكد من الإنترنت."; }
         }
 
-        function showSection(id) { document.getElementById(id).style.display = 'block'; document.getElementById('sidebar').classList.add('translate-x-full'); if(id==='vault') renderVault(); if(id==='studyStats') renderStats(); if(id==='examHistory') renderHistory(); }
-        function renderVault() { document.getElementById('vaultList').innerHTML = allPDFs.map((p, i) => `<div onclick="closePage('vault'); openSectionPage('studyPage')" class="glass p-6 rounded-2xl cursor-pointer hover:border-blue-500 text-right">📄 ${p.name}</div>`).join(''); }
-        function renderStats() { 
-            saveToUser('stats', { date: new Date().toLocaleDateString('ar-EG'), time: document.getElementById('sessionTimer').innerText });
-            const s = JSON.parse(localStorage.getItem(`u_${currentUser.phone}_stats`) || "[]");
-            document.getElementById('statsList').innerHTML = s.reverse().map(x => `<div class="glass p-5 rounded-2xl flex justify-between"><span>📅 ${x.date}</span><span class="text-blue-400 font-bold">${x.time}</span></div>`).join('');
-        }
-        function renderHistory() {
-            const e = JSON.parse(localStorage.getItem(`u_${currentUser.phone}_exams`) || "[]");
-            document.getElementById('historyList').innerHTML = e.reverse().map(x => `<div class="glass p-5 rounded-2xl flex justify-between items-center border-r-4 border-orange-500"><div class="text-right"><p class="font-bold text-xl">${x.score}</p><p class="text-[10px] text-gray-500">${x.date}</p></div><span class="bg-orange-900/20 px-3 py-1 rounded-lg text-[10px]">${x.type}</span></div>`).join('');
-        }
-        function showAdminPrompt() { if(prompt("أدخل كلمة سر الإدارة:") === "1542") { showSection('adminPanel'); renderAdmin(); } else alert("خطأ!"); }
-        function renderAdmin() {
-            const u = JSON.parse(localStorage.getItem('adm_users') || "[]"), r = JSON.parse(localStorage.getItem('adm_reports') || "[]");
-            document.getElementById('adminData').innerHTML = `<div class="glass p-6 rounded-2xl"><h3>الطلاب (${u.length})</h3>${u.map(x=>`<p class='text-xs mt-2'>• ${x.name} (${x.phone})</p>`).join('')}</div><div class="glass p-6 rounded-2xl"><h3>البلاغات</h3>${r.map(x=>`<p class='text-xs mt-2'>• ${x.userName}: ${x.msg}</p>`).join('')}</div>`;
-        }
-        function saveToUser(k, v) { let d = JSON.parse(localStorage.getItem(`u_${currentUser.phone}_${k}`) || "[]"); d.push(v); localStorage.setItem(`u_${currentUser.phone}_${k}`, JSON.stringify(d)); }
-        function saveToAdmin(k, v) { let d = JSON.parse(localStorage.getItem(`adm_${k}`) || "[]"); d.push({...v, userName: currentUser?.name || 'زائر'}); localStorage.setItem(`adm_${k}`, JSON.stringify(d)); }
-        function sendMsg() { saveToAdmin('reports', { msg: document.getElementById('msg').value }); alert("تم الإرسال للسبكي ✅"); closePage('support'); }
         document.getElementById('menuBtn').onclick = () => document.getElementById('sidebar').classList.toggle('translate-x-full');
     </script>
 </body>
