@@ -6,197 +6,191 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>8/1 ♾️ | R&M</title>
     <style>
-        :root {
-            --red: #ff0000;
-            --dark-red: #8b0000;
-        }
-
         body {
-            background: radial-gradient(circle at center, #1a0202 0%, #000 100%);
-            color: #fff;
+            background-color: #050505;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
+            background: radial-gradient(circle, #1a0505 0%, #000 100%);
         }
 
-        /* العنوان العلوي */
-        .title-top {
-            font-size: 3.5rem;
-            color: var(--red);
-            text-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
-            margin-bottom: 10px;
-            font-weight: bold;
+        /* العنوان */
+        .header-title {
+            font-size: 3rem;
+            color: #ff3333;
+            text-shadow: 0 0 15px rgba(255, 51, 51, 0.5);
+            margin-bottom: 20px;
         }
 
         /* العداد الاحترافي */
-        .timer-container {
+        #timer {
             display: flex;
             gap: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 25px 45px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px 40px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 0, 0, 0.2);
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255, 51, 51, 0.2);
+            backdrop-filter: blur(10px);
             margin-bottom: 50px;
-            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .unit { text-align: center; min-width: 80px; }
-        .num { font-size: 3rem; font-weight: 900; display: block; color: #fff; }
-        .label { font-size: 0.9rem; color: var(--red); font-weight: bold; }
+        .unit { text-align: center; min-width: 75px; }
+        .num { font-size: 3rem; font-weight: bold; display: block; color: #fff; }
+        .label { font-size: 0.8rem; color: #ff3333; font-weight: bold; }
 
         /* منطقة القلب والنبض */
-        .heart-system {
+        .heart-section {
             display: flex;
             align-items: center;
-            width: 90%;
+            width: 85%;
             max-width: 800px;
             position: relative;
         }
 
-        /* خط النبض الحقيقي ECG */
-        .ecg-line {
-            flex: 1;
-            height: 120px;
-        }
-
+        /* خط النبض الحقيقي */
+        .ecg-svg { flex: 1; height: 120px; }
         .ecg-path {
-            fill: none;
-            stroke: var(--red);
-            stroke-width: 3;
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: moveLine 3s linear infinite;
+            fill: none; stroke: #ff0000; stroke-width: 3;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000;
+            animation: ecg-draw 2.5s linear infinite;
         }
+        @keyframes ecg-draw { to { stroke-dashoffset: 0; } }
 
-        @keyframes moveLine { to { stroke-dashoffset: 0; } }
-
-        /* القلب الواقعي */
-        .heart-wrap {
+        /* حاوية القلب */
+        .heart-container {
             position: relative;
             width: 180px;
             height: 180px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        .anatomical-heart {
-            width: 160px;
-            filter: drop-shadow(0 0 15px var(--red));
-            z-index: 2;
-            /* حركة نبض حقيقية مزدوجة */
-            animation: realBeat 0.8s infinite cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* القلب التشريحي الواقعي */
+        .real-anatomical-heart {
+            width: 100%;
+            filter: drop-shadow(0 0 15px #ff0000);
+            /* نبض بشري حقيقي: انقباض ثنائي */
+            animation: human-beat 0.85s infinite; 
+            z-index: 1;
         }
 
-        @keyframes realBeat {
+        @keyframes human-beat {
             0% { transform: scale(1); }
-            15% { transform: scale(1.18); }
+            15% { transform: scale(1.15); }
             30% { transform: scale(1.05); }
-            45% { transform: scale(1.25); }
+            45% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
 
-        /* دمج R & M مع الانفينيتي مرسومة */
-        .infinity-letters {
+        /* دمج R و M مع الانفينيتي */
+        .brand-overlay {
             position: absolute;
-            z-index: 5;
-            top: 55%;
+            top: 60%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 100px;
+            z-index: 10;
+            text-align: center;
             pointer-events: none;
+            width: 120px;
         }
 
-        .infinity-svg {
-            width: 100%;
-            fill: none;
-            stroke: #fff;
-            stroke-width: 4;
-            filter: drop-shadow(0 0 5px #000);
+        .infinity-design {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            text-shadow: 0 0 10px #000, 0 0 5px #ff0000;
+        }
+
+        .infinity-symbol {
+            font-size: 2.2rem;
+            color: #ff3333;
+            line-height: 0;
+            margin: 0 -5px;
         }
 
         /* كلمة بحبك */
-        .love-burst {
+        .love-msg {
             position: absolute;
             right: 0;
-            top: -40px;
+            top: -50px;
             color: #ff4d4d;
             font-size: 2rem;
             font-weight: bold;
             opacity: 0;
             text-shadow: 0 0 10px #fff;
         }
-
-        .animate-love { animation: burst 0.8s ease-out; }
-
-        @keyframes burst {
-            0% { opacity: 0; transform: scale(0.5) translateY(0); }
-            50% { opacity: 1; transform: scale(1.2) translateY(-50px); }
-            100% { opacity: 0; transform: scale(1.5) translateY(-100px); }
+        .pop { animation: pop-up 0.85s ease-out; }
+        @keyframes pop-up {
+            0% { opacity: 0; transform: translateY(0) scale(0.5); }
+            50% { opacity: 1; transform: translateY(-70px) scale(1.2); }
+            100% { opacity: 0; transform: translateY(-130px) scale(1.5); }
         }
     </style>
 </head>
 <body>
 
-    <div class="title-top">8/1 ♾️</div>
+    <div class="header-title">8/1 ♾️</div>
 
-    <div class="timer-container">
-        <div class="unit"><span class="num" id="days">00</span><span class="label">يوم</span></div>
-        <div class="unit"><span class="num" id="hours">00</span><span class="label">ساعة</span></div>
-        <div class="unit"><span class="num" id="minutes">00</span><span class="label">دقيقة</span></div>
-        <div class="unit"><span class="num" id="seconds">00</span><span class="label">ثانية</span></div>
+    <div id="timer">
+        <div class="unit"><span class="num" id="d">00</span><span class="label">يوم</span></div>
+        <div class="unit"><span class="num" id="h">00</span><span class="label">ساعة</span></div>
+        <div class="unit"><span class="num" id="m">00</span><span class="label">دقيقة</span></div>
+        <div class="unit"><span class="num" id="s">00</span><span class="label">ثانية</span></div>
     </div>
 
-    <div class="heart-system">
-        <svg class="ecg-line" viewBox="0 0 400 100">
-            <path class="ecg-path" d="M0,50 L100,50 L110,30 L125,70 L140,50 L250,50 L260,10 L280,90 L300,50 L400,50" />
+    <div class="heart-section">
+        <svg class="ecg-svg" viewBox="0 0 400 100">
+            <path class="ecg-path" d="M0,50 L100,50 L110,25 L125,75 L140,50 L250,50 L260,10 L280,90 L300,50 L400,50" />
         </svg>
 
-        <div class="heart-wrap">
-            <div id="loveText" class="love-burst">بحبك</div>
+        <div class="heart-container">
+            <div id="love" class="love-msg">بحبك</div>
             
-            <div class="infinity-letters">
-                <svg class="infinity-svg" viewBox="0 0 100 50">
-                    <path d="M30,25 C30,10 45,10 50,25 C55,40 70,40 70,25 C70,10 55,10 50,25 C45,40 30,40 30,25" stroke="#ff4d4d" stroke-width="3"/>
-                    <text x="12" y="32" fill="white" font-size="18" font-weight="bold" font-family="Arial">R</text>
-                    <text x="75" y="32" fill="white" font-size="18" font-weight="bold" font-family="Arial">M</text>
-                </svg>
+            <div class="brand-overlay">
+                <div class="infinity-design">
+                    <span>R</span>
+                    <span class="infinity-symbol">∞</span>
+                    <span>M</span>
+                </div>
             </div>
 
-            <img src="https://cdn-icons-png.flaticon.com/512/822/822118.png" class="anatomical-heart" alt="Real Heart">
+            <img src="https://cdn-icons-png.flaticon.com/512/822/822118.png" class="real-anatomical-heart" alt="Real Heart">
         </div>
     </div>
 
     <script>
-        // العداد من 8/1/2025
-        const startDate = new Date("January 8, 2025 00:00:00").getTime();
+        // تاريخ البداية
+        const start = new Date("January 8, 2025 00:00:00").getTime();
 
-        function updateTimer() {
+        function update() {
             const now = new Date().getTime();
-            const diff = now - startDate;
+            const diff = now - start;
 
-            document.getElementById("days").innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
-            document.getElementById("hours").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            document.getElementById("minutes").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            document.getElementById("seconds").innerText = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById("d").innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById("h").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById("m").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("s").innerText = Math.floor((diff % (1000 * 60)) / 1000);
         }
 
-        // مزامنة كلمة بحبك مع النبض الطبيعي
-        const love = document.getElementById("loveText");
+        // تزامن كلمة بحبك مع النبض
+        const loveWord = document.getElementById("love");
         setInterval(() => {
-            love.classList.remove("animate-love");
-            void love.offsetWidth; 
-            love.classList.add("animate-love");
-        }, 800);
+            loveWord.classList.remove("pop");
+            void loveWord.offsetWidth;
+            loveWord.classList.add("pop");
+        }, 850);
 
-        setInterval(updateTimer, 1000);
-        updateTimer();
+        setInterval(update, 1000);
+        update();
     </script>
 </body>
 </html>
