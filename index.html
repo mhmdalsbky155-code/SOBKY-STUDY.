@@ -3,175 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة السبكي التعليمية الذكية</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>عداد الحب الأبدي</title>
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #010409; color: #e6edf3; overflow: hidden; }
-        .glass { background: rgba(13, 17, 23, 0.98); backdrop-filter: blur(20px); border: 1px solid #30363d; }
-        .full-page { position: fixed; inset: 0; z-index: 500; background: #010409; display: none; flex-direction: column; }
-        .sidebar { transition: 0.3s; z-index: 1000; }
-        iframe { width: 100%; height: 100%; border: none; background: white; border-radius: 15px; }
-        .option-btn { background: #21262d; border: 1px solid #30363d; width: 100%; padding: 1.2rem; border-radius: 1.5rem; text-align: right; margin-bottom: 0.8rem; transition: 0.3s; }
-        .correct { background: #238636 !important; }
-        .wrong { background: #da3633 !important; }
-        .loader { width: 50px; height: 50px; border: 5px solid #30363d; border-top-color: #58a6ff; border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        body {
+            background-color: #0a0a0a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* تصميم العداد */
+        #timer {
+            display: flex;
+            gap: 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            margin-bottom: 50px;
+        }
+
+        .time-unit {
+            text-align: center;
+        }
+
+        .time-unit span {
+            display: block;
+            font-size: 1rem;
+            color: #ff4d4d;
+            text-transform: uppercase;
+        }
+
+        /* حاوية القلب والنبض */
+        .container {
+            position: relative;
+            width: 600px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* خط النبض */
+        .heartbeat-line {
+            width: 400px;
+            height: 100px;
+            stroke: #ff0000;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 3s linear infinite;
+        }
+
+        @keyframes draw {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* تصميم القلب الواقعي */
+        .real-heart {
+            width: 100px;
+            cursor: pointer;
+            filter: drop-shadow(0 0 15px red);
+            animation: beat 0.8s infinite alternate cubic-bezier(0.215, 0.61, 0.355, 1);
+            z-index: 10;
+        }
+
+        @keyframes beat {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); }
+        }
+
+        /* كلمة بحبك المتطايرة */
+        .love-text {
+            position: absolute;
+            color: #ff4d4d;
+            font-weight: bold;
+            font-size: 1.5rem;
+            pointer-events: none;
+            animation: flyUp 2s forwards ease-out;
+            white-space: nowrap;
+        }
+
+        @keyframes flyUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-150px) scale(2); }
+        }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen" class="fixed inset-0 z-[1200] flex items-center justify-center bg-[#010409] p-4 text-right">
-        <div class="glass p-10 rounded-[3rem] w-full max-w-md border-t-8 border-blue-600 shadow-2xl">
-            <h1 class="text-4xl font-bold text-center mb-10 text-blue-500 italic">Sobky AI</h1>
-            <div class="space-y-4">
-                <input type="text" id="uName" placeholder="الاسم بالكامل" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-2xl outline-none">
-                <input type="password" id="uPass" placeholder="كلمة السر" class="w-full bg-[#0d1117] border border-[#30363d] p-4 rounded-2xl outline-none">
-                <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-2xl font-bold text-xl active:scale-95 transition">دخول المنصة</button>
-            </div>
-        </div>
+    <div id="timer">
+        <div class="time-unit"><div id="days">00</div><span>يوم</span></div>
+        <div class="time-unit"><div id="hours">00</div><span>ساعة</span></div>
+        <div class="time-unit"><div id="minutes">00</div><span>دقيقة</span></div>
+        <div class="time-unit"><div id="seconds">00</div><span>ثانية</span></div>
     </div>
 
-    <div id="mainDashboard" class="p-6 pt-24 max-w-6xl mx-auto hidden text-right">
-        <div class="glass p-6 rounded-3xl mb-10 flex justify-between items-center shadow-lg border border-white/5">
-            <div>مرحباً، <span id="displayName" class="text-blue-400 font-bold"></span></div>
-            <button onclick="document.getElementById('pdfInp').click()" class="bg-blue-600 px-6 py-2 rounded-xl text-sm font-bold shadow-lg">+ رفع ملف PDF</button>
-            <input type="file" id="pdfInp" class="hidden" accept=".pdf" onchange="uploadPDF(event)">
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div onclick="openPage('studyPage')" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-6 cursor-pointer border-b-8 border-blue-500 hover:bg-blue-500/5 transition active:scale-95">
-                <span class="text-6xl">📖</span><span class="text-2xl font-bold">المذاكرة</span>
-            </div>
-            <div onclick="generateExam(10)" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-6 cursor-pointer border-b-8 border-orange-500 hover:bg-orange-500/5 transition active:scale-95">
-                <span class="text-6xl">📝</span><span class="text-2xl font-bold">امتحان (10س)</span>
-            </div>
-            <div onclick="generateExam(30)" class="glass p-10 rounded-[2.5rem] flex flex-col items-center gap-6 cursor-pointer border-b-8 border-purple-500 hover:bg-purple-500/5 transition active:scale-95">
-                <span class="text-6xl">🏆</span><span class="text-2xl font-bold">شامل (30س)</span>
-            </div>
-        </div>
-    </div>
-
-    <div id="studyPage" class="full-page">
-        <div class="flex flex-col h-full">
-            <div class="p-4 glass flex justify-between items-center border-b border-gray-800">
-                <button onclick="closePage('studyPage')" class="bg-red-500 px-6 py-2 rounded-xl font-bold">إغلاق</button>
-                <div class="flex gap-2">
-                    <input type="text" id="tWord" placeholder="ترجم مصطلح طبي..." class="bg-black/50 border border-gray-700 px-4 py-2 rounded-xl text-sm outline-none">
-                    <button onclick="translateQuick()" class="bg-blue-600 px-4 py-2 rounded-xl font-bold text-xs">ترجم</button>
-                </div>
-            </div>
-            <div class="flex-1 p-2 bg-[#525659]">
-                <iframe id="pdfFrame"></iframe>
-            </div>
-            <div id="tResult" class="p-4 glass text-center font-bold text-blue-400 min-h-[60px]">اكتب أي كلمة طبية لترجمتها فوراً</div>
-        </div>
-    </div>
-
-    <div id="examPage" class="full-page flex flex-col items-center justify-center p-6">
-        <div class="w-full max-w-2xl glass p-10 rounded-[3rem] shadow-2xl relative">
-            <button onclick="closePage('examPage')" class="absolute top-6 left-6 text-gray-500">خروج</button>
-            <div id="examMain" class="text-center"></div>
+    <div class="container">
+        <svg class="heartbeat-line" viewBox="0 0 400 100">
+            <path d="M0,50 L50,50 L60,20 L75,80 L90,50 L150,50 L160,10 L180,90 L200,50 L300,50 L310,30 L320,70 L330,50 L400,50" />
+        </svg>
+        
+        <div id="heart-container" style="position: relative;">
+            <img src="https://img.icons8.com/plasticine/200/human-heart.png" alt="Real Heart" class="real-heart" id="main-heart">
         </div>
     </div>
 
     <script>
-        const API_KEY = "AIzaSyC1BwXz-nHSiFfxh5ux5Y6RexU0FqlD9do";
-        let user = null, files = [];
+        // تحديد تاريخ البداية: 8 يناير 2025
+        const startDate = new Date("January 8, 2025 00:00:00").getTime();
 
-        function login() {
-            const n = document.getElementById('uName').value, p = document.getElementById('uPass').value;
-            if(p === "elsobky12222" && n.length > 2) {
-                user = { name: n };
-                document.getElementById('displayName').innerText = n;
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainDashboard').style.display = 'block';
-            } else alert("بيانات خاطئة!");
+        function updateTimer() {
+            const now = new Date().getTime();
+            const distance = now - startDate;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = days;
+            document.getElementById("hours").innerText = hours;
+            document.getElementById("minutes").innerText = minutes;
+            document.getElementById("seconds").innerText = seconds;
         }
 
-        async function uploadPDF(e) {
-            const file = e.target.files[0]; if(!file) return;
-            const url = URL.createObjectURL(file);
-            const reader = new FileReader();
-            reader.onload = async function() {
-                const typed = new Uint8Array(this.result);
-                const pdf = await pdfjsLib.getDocument(typed).promise;
-                let text = "";
-                for(let i=1; i<=pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const content = await page.getTextContent();
-                    text += content.items.map(s => s.str).join(" ") + " ";
-                }
-                files.push({ name: file.name, url: url, text: text.replace(/\s+/g, ' ').trim() });
-                alert("تم رفع " + file.name + " بنجاح ✅");
-            };
-            reader.readAsArrayBuffer(file);
+        // إنشاء كلمة "بحبك" مع كل نبضة
+        function createLoveText() {
+            const container = document.getElementById("heart-container");
+            const text = document.createElement("div");
+            text.className = "love-text";
+            text.innerText = "بحبك";
+            container.appendChild(text);
+
+            setTimeout(() => {
+                text.remove();
+            }, 2000);
         }
 
-        function openPage(id) {
-            if(files.length === 0) return alert("ارفع ملف أولاً!");
-            document.getElementById(id).style.display = 'flex';
-            if(id === 'studyPage') document.getElementById('pdfFrame').src = files[files.length-1].url;
-        }
+        // تحديث العداد كل ثانية
+        setInterval(updateTimer, 1000);
+        
+        // إطلاق الكلمة تزامناً مع النبض (كل 800 مللي ثانية)
+        setInterval(createLoveText, 800);
 
-        function closePage(id) { document.getElementById(id).style.display = 'none'; }
-
-        async function translateQuick() {
-            const w = document.getElementById('tWord').value;
-            const res = document.getElementById('tResult');
-            if(!w) return; res.innerText = "جاري الترجمة...";
-            try {
-                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
-                    method: "POST", body: JSON.stringify({ contents: [{ parts: [{ text: `Translate medical term "${w}" to Arabic concisely.` }] }] })
-                });
-                const d = await r.json();
-                res.innerText = d.candidates[0].content.parts[0].text;
-            } catch(e) { res.innerText = "حدث خطأ في الاتصال"; }
-        }
-
-        async function generateExam(count) {
-            if(files.length === 0) return alert("ارفع ملف أولاً!");
-            openPage('examPage');
-            const main = document.getElementById('examMain');
-            main.innerHTML = `<div class="loader mx-auto"></div><p>جاري توليد ${count} سؤال ذكي...</p>`;
-            
-            const source = count === 30 ? files.map(f => f.text).join(" ") : files[files.length-1].text;
-            const cleaned = source.substring(0, 4500); // تنظيف النص لضمان نجاح الـ AI
-
-            const prompt = `Based on: "${cleaned}", generate ${count} MCQ in Arabic. Respond ONLY with JSON array: [{"q":"..","o":["..","..","..",".."],"a":index}]`;
-            
-            try {
-                const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
-                    method: "POST", body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                });
-                const d = await r.json();
-                const qs = JSON.parse(d.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim());
-                
-                let cur = 0, score = 0;
-                const showQ = () => {
-                    const q = qs[cur];
-                    main.innerHTML = `
-                        <div class="text-right">
-                            <span class="bg-blue-600 px-3 py-1 rounded-full text-xs font-bold mb-6 inline-block">سؤال ${cur+1}/${count}</span>
-                            <h3 class="font-bold text-xl mb-10 leading-relaxed">${q.q}</h3>
-                            <div class="space-y-3">${q.o.map((o, i) => `<button onclick="checkAns(${i}, ${q.a}, this)" class="option-btn">${o}</button>`).join('')}</div>
-                            <button id="nxtBtn" disabled onclick="nextQ()" class="w-full mt-10 bg-white text-black py-4 rounded-2xl font-bold opacity-20">السؤال التالي</button>
-                        </div>
-                    `;
-                };
-                window.checkAns = (i, a, btn) => {
-                    const btns = document.querySelectorAll('.option-btn'); btns.forEach(b => b.disabled = true);
-                    if(i === a) { btn.classList.add('correct'); score++; } else { btn.classList.add('wrong'); btns[a].classList.add('correct'); }
-                    document.getElementById('nxtBtn').disabled = false; document.getElementById('nxtBtn').style.opacity = "1";
-                };
-                window.nextQ = () => {
-                    cur++; if(cur < count) showQ();
-                    else main.innerHTML = `<h2 class="text-7xl font-bold mb-6 text-blue-500">${score}/${count}</h2><button onclick="closePage('examPage')" class="bg-blue-600 px-10 py-3 rounded-2xl font-bold">العودة للرئيسية</button>`;
-                };
-                showQ();
-            } catch(e) { main.innerHTML = "<p class='text-red-500 font-bold'>عذراً، فشل توليد الأسئلة بسبب تعقيد الملف. حاول مرة أخرى بملف أصغر قليلاً.</p>"; }
-        }
+        updateTimer();
     </script>
 </body>
-    </html> 
+</html>
