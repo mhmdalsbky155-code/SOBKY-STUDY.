@@ -1,159 +1,200 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عداد الحب الأبدي</title>
+    <title>8/1 ♾️ | R & M</title>
     <style>
+        :root {
+            --heart-color: #ff0000;
+            --accent: #ff4d4d;
+        }
+
         body {
-            background-color: #0a0a0a;
+            background-color: #050505;
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
             overflow: hidden;
+            background: radial-gradient(circle, #200505 0%, #050505 100%);
         }
 
-        /* تصميم العداد */
+        .header {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        /* العداد الاحترافي */
         #timer {
             display: flex;
             gap: 20px;
-            font-size: 2.5rem;
-            font-weight: bold;
-            text-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             margin-bottom: 50px;
         }
 
-        .time-unit {
+        .unit {
             text-align: center;
+            min-width: 90px;
         }
 
-        .time-unit span {
+        .unit .num {
+            font-size: 3rem;
+            font-weight: bold;
             display: block;
-            font-size: 1rem;
-            color: #ff4d4d;
+        }
+
+        .unit .label {
+            font-size: 0.8rem;
+            color: var(--accent);
             text-transform: uppercase;
         }
 
-        /* حاوية القلب والنبض */
-        .container {
-            position: relative;
-            width: 600px;
-            height: 200px;
+        /* منطقة النبض والقلب */
+        .heart-area {
             display: flex;
             align-items: center;
-            justify-content: center;
+            width: 90%;
+            max-width: 900px;
+            position: relative;
         }
 
-        /* خط النبض */
-        .heartbeat-line {
-            width: 400px;
-            height: 100px;
-            stroke: #ff0000;
-            stroke-width: 3;
+        .pulse-line {
+            flex-grow: 1;
+            height: 150px;
+        }
+
+        .path {
             fill: none;
+            stroke: var(--heart-color);
+            stroke-width: 3;
             stroke-dasharray: 1000;
             stroke-dashoffset: 1000;
             animation: draw 3s linear infinite;
         }
 
-        @keyframes draw {
-            to { stroke-dashoffset: 0; }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+
+        /* القلب الواقعي */
+        .heart-box {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* تصميم القلب الواقعي */
         .real-heart {
-            width: 100px;
-            cursor: pointer;
-            filter: drop-shadow(0 0 15px red);
-            animation: beat 0.8s infinite alternate cubic-bezier(0.215, 0.61, 0.355, 1);
+            width: 100%;
+            filter: drop-shadow(0 0 20px red);
+            animation: beat 0.8s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+
+        /* حرف R و M بشكل انفينيتي */
+        .initials {
+            position: absolute;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px black;
+            display: flex;
+            align-items: center;
+            gap: 5px;
             z-index: 10;
+        }
+
+        .infinity-symbol {
+            font-size: 2.2rem;
+            color: var(--accent);
         }
 
         @keyframes beat {
             0% { transform: scale(1); }
-            100% { transform: scale(1.15); }
+            20% { transform: scale(1.15); }
+            40% { transform: scale(1.05); }
+            60% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
-        /* كلمة بحبك المتطايرة */
-        .love-text {
+        /* كلمة بحبك المتناغمة */
+        .love-pop {
             position: absolute;
-            color: #ff4d4d;
+            right: 0;
+            top: -40px;
+            color: var(--accent);
             font-weight: bold;
             font-size: 1.5rem;
-            pointer-events: none;
-            animation: flyUp 2s forwards ease-out;
-            white-space: nowrap;
+            opacity: 0;
         }
 
-        @keyframes flyUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-150px) scale(2); }
+        .pop-animation {
+            animation: fly 0.8s ease-out;
+        }
+
+        @keyframes fly {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-100px); }
         }
     </style>
 </head>
 <body>
 
+    <div class="header">8/1 ♾️</div>
+
     <div id="timer">
-        <div class="time-unit"><div id="days">00</div><span>يوم</span></div>
-        <div class="time-unit"><div id="hours">00</div><span>ساعة</span></div>
-        <div class="time-unit"><div id="minutes">00</div><span>دقيقة</span></div>
-        <div class="time-unit"><div id="seconds">00</div><span>ثانية</span></div>
+        <div class="unit"><span class="num" id="d">00</span><span class="label">يوم</span></div>
+        <div class="unit"><span class="num" id="h">00</span><span class="label">ساعة</span></div>
+        <div class="unit"><span class="num" id="m">00</span><span class="label">دقيقة</span></div>
+        <div class="unit"><span class="num" id="s">00</span><span class="label">ثانية</span></div>
     </div>
 
-    <div class="container">
-        <svg class="heartbeat-line" viewBox="0 0 400 100">
-            <path d="M0,50 L50,50 L60,20 L75,80 L90,50 L150,50 L160,10 L180,90 L200,50 L300,50 L310,30 L320,70 L330,50 L400,50" />
+    <div class="heart-area">
+        <svg class="pulse-line" viewBox="0 0 500 100">
+            <path class="path" d="M0,50 L150,50 L160,30 L175,70 L190,50 L300,50 L310,10 L330,90 L350,50 L500,50" />
         </svg>
-        
-        <div id="heart-container" style="position: relative;">
-            <img src="https://img.icons8.com/plasticine/200/human-heart.png" alt="Real Heart" class="real-heart" id="main-heart">
+
+        <div class="heart-box">
+            <div id="pop-text" class="love-pop">بحبك</div>
+            <div class="initials">R <span class="infinity-symbol">∞</span> M</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/3233/3233481.png" class="real-heart" alt="Real Heart">
         </div>
     </div>
 
     <script>
-        // تحديد تاريخ البداية: 8 يناير 2025
-        const startDate = new Date("January 8, 2025 00:00:00").getTime();
+        const start = new Date("January 8, 2025 00:00:00").getTime();
 
-        function updateTimer() {
+        function update() {
             const now = new Date().getTime();
-            const distance = now - startDate;
+            const diff = now - start;
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            document.getElementById("days").innerText = days;
-            document.getElementById("hours").innerText = hours;
-            document.getElementById("minutes").innerText = minutes;
-            document.getElementById("seconds").innerText = seconds;
+            document.getElementById("d").innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById("h").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById("m").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("s").innerText = Math.floor((diff % (1000 * 60)) / 1000);
         }
 
-        // إنشاء كلمة "بحبك" مع كل نبضة
-        function createLoveText() {
-            const container = document.getElementById("heart-container");
-            const text = document.createElement("div");
-            text.className = "love-text";
-            text.innerText = "بحبك";
-            container.appendChild(text);
+        const pop = document.getElementById("pop-text");
+        setInterval(() => {
+            pop.classList.remove("pop-animation");
+            void pop.offsetWidth;
+            pop.classList.add("pop-animation");
+        }, 800);
 
-            setTimeout(() => {
-                text.remove();
-            }, 2000);
-        }
-
-        // تحديث العداد كل ثانية
-        setInterval(updateTimer, 1000);
-        
-        // إطلاق الكلمة تزامناً مع النبض (كل 800 مللي ثانية)
-        setInterval(createLoveText, 800);
-
-        updateTimer();
+        setInterval(update, 1000);
+        update();
     </script>
 </body>
 </html>
